@@ -1,0 +1,6 @@
+export const BACKGROUND_ANIMATION_DURATION = 200;
+export const SCALE_ANIMATION_DURATION = 150;
+export const SHAKE_DURATION = 75;
+export const SHAKE_OFFSET = 10;
+export const BOARD_SCALE_DURATION = 100;
+export const SOLVE_OFFSET_DURATION = 1;
