@@ -5,7 +5,6 @@ import {
   START_COIN,
   UNDO_COST,
 } from '../../constants/game';
-import {PathTheme} from '../../models/game';
 import {PATH_THEMES} from '../../constants/themes';
 
 interface UserDataState {
@@ -13,10 +12,9 @@ interface UserDataState {
   currentPathMoves: string[];
   globalLoading: boolean;
   coin: number;
-  pathThemes: PathTheme[];
   pathColor: string;
   selectedTheme: number;
-  unlockedThemes: PathTheme[];
+  unlockedThemes: number[];
 }
 
 const initialState: UserDataState = {
@@ -24,10 +22,9 @@ const initialState: UserDataState = {
   currentPathMoves: [],
   globalLoading: false,
   coin: START_COIN,
-  pathThemes: PATH_THEMES,
-  pathColor: PATH_THEMES[0].color,
-  selectedTheme: PATH_THEMES[0].id,
-  unlockedThemes: [],
+  pathColor: '#EC4899',
+  selectedTheme: 1,
+  unlockedThemes: [1],
 };
 
 export const userSlicer = createSlice({
@@ -60,7 +57,7 @@ export const userSlicer = createSlice({
     },
     setSelectedTheme: (state, action) => {
       state.selectedTheme = action.payload;
-      state.pathColor = state.pathThemes[action.payload - 1].color;
+      state.pathColor = PATH_THEMES[action.payload - 1].color;
     },
     setCurrentPathMoves: (state, action) => {
       state.currentPathMoves = action.payload;
@@ -70,12 +67,21 @@ export const userSlicer = createSlice({
     },
     buyTheme: (state, action) => {
       const themeId = action.payload;
-      const themeToPurchase = state.pathThemes[themeId - 1];
+      const themeToPurchase = PATH_THEMES[themeId - 1];
       const {price} = themeToPurchase;
-      if (state.coin >= price && state.pathThemes[themeId - 1]) {
+      if (state.coin >= price && PATH_THEMES[themeId - 1]) {
         state.coin -= price;
-        state.pathThemes[themeId - 1].unlocked = true;
+        state.unlockedThemes = [...state.unlockedThemes, themeId];
       }
+    },
+    clearData: state => {
+      state.currentLevel = 1;
+      state.currentPathMoves = [];
+      state.globalLoading = false;
+      state.coin = START_COIN;
+      state.pathColor = '#EC4899';
+      state.selectedTheme = 1;
+      state.unlockedThemes = [1];
     },
   },
 });
@@ -93,5 +99,6 @@ export const {
   buyTheme,
   setCurrentPathMoves,
   clearPathMoves,
+  clearData,
 } = userSlicer.actions;
 export default userSlicer.reducer;

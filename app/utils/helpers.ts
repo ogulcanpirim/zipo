@@ -1,4 +1,4 @@
-import store from '../store';
+import redux from '../store';
 
 export const getLevelData = (id: number) => {
   switch (id) {
@@ -37,7 +37,7 @@ export const getLevel = (level: number) => {
 };
 
 export const getCurrentLevel = () => {
-  const currentLevel = store.getState().userData.currentLevel;
+  const currentLevel = redux.store.getState().userData.currentLevel;
   return getLevel(currentLevel);
 };
 

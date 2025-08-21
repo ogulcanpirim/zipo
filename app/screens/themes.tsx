@@ -5,7 +5,7 @@ import {Header} from '../components/Header';
 import {ThemeCard} from '../components/ThemeCard';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
-import {Theme} from '../constants/themes';
+import {PATH_THEMES, Theme} from '../constants/themes';
 import {useAppSelector} from '../hooks/useAppSelector';
 import {useAppDispatch} from '../store';
 import {buyTheme, setSelectedTheme} from '../store/slicers/user.slice';
@@ -14,7 +14,9 @@ import {SOUNDS} from '../models/game';
 
 export const ThemesScreen = () => {
   const dispatch = useAppDispatch();
-  const {pathThemes, selectedTheme} = useAppSelector(state => state.userData);
+  const {selectedTheme, unlockedThemes} = useAppSelector(
+    state => state.userData,
+  );
   const {play} = useSound();
 
   const handleThemeEquip = (themeId: number) => {
@@ -34,7 +36,7 @@ export const ThemesScreen = () => {
           themeName={theme.name}
           themeDescription={theme.description}
           price={theme.price}
-          unlocked={theme.unlocked}
+          unlocked={unlockedThemes.includes(theme.id)}
           isEquipped={selectedTheme === theme.id}
           onEquip={() => handleThemeEquip(theme.id)}
           onPurchase={() => handleThemePurchase(theme.id)}
@@ -57,7 +59,9 @@ export const ThemesScreen = () => {
             unique
           </EQText>
         </View>
-        <View style={styles.themesGrid}>{pathThemes.map(renderThemeCard)}</View>
+        <View style={styles.themesGrid}>
+          {PATH_THEMES.map(renderThemeCard)}
+        </View>
       </ScrollView>
     </View>
   );

@@ -1,33 +1,29 @@
 import {RouteProp, useRoute} from '@react-navigation/native';
 import React from 'react';
-import {
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import Animated, {FadeIn} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import CoinSvg from '../components/CoinSvg';
 import {CoinWrap} from '../components/CoinWrap';
 import {EQText} from '../components/EQText';
+import {Pressable} from '../components/Pressable';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import {useAppNavigation} from '../hooks/useAppNavigation';
 import {useAppSelector} from '../hooks/useAppSelector';
+import {useSound} from '../hooks/useSound';
+import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 import {useAppDispatch} from '../store';
 import {incrementLevel} from '../store/slicers/user.slice';
 import {formatCoinCount, getCurrentLevel} from '../utils/helpers';
-import {Pressable} from '../components/Pressable';
-import {SOUNDS} from '../models/game';
-import {useSound} from '../hooks/useSound';
-import LinearGradient from 'react-native-linear-gradient';
-import CoinSvg from '../components/CoinSvg';
 
 export const GameFinishScreen = () => {
   const dispatch = useAppDispatch();
+  const insets = useSafeAreaInsets();
   const navigation = useAppNavigation();
   const route =
     useRoute<RouteProp<{params: {imageUri: string; rewardCoin: number}}>>();
@@ -52,7 +48,7 @@ export const GameFinishScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={[styles.safeArea, {paddingTop: insets.top}]}>
       <View style={styles.header}>
         <CoinWrap />
         <TouchableOpacity
@@ -113,7 +109,7 @@ export const GameFinishScreen = () => {
           </Pressable>
         </Animated.View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -148,7 +144,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 4,
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 6,
     marginTop: 15,
     borderRadius: 12,
     borderWidth: 1,

@@ -20,8 +20,11 @@ import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 import {getCurrentLevel} from '../utils/helpers';
 import {StartButton} from '../components/StartButton';
+import {useAppDispatch} from '../store';
+import {clearData} from '../store/slicers/user.slice';
 
 export const DashboardScreen = () => {
+  const dispatch = useAppDispatch();
   const navigation = useAppNavigation();
   const {expand} = useBottomSheet();
 
@@ -49,6 +52,10 @@ export const DashboardScreen = () => {
       enablePanDownToClose: true,
       pressBehavior: 'close',
     });
+  };
+
+  const handleReset = () => {
+    dispatch(clearData());
   };
 
   return (
@@ -156,6 +163,26 @@ export const DashboardScreen = () => {
                   style={styles.sectionIcon}
                 />
                 <EQText style={styles.sectionText}>Themes</EQText>
+              </View>
+            </LinearGradient>
+          </Pressable>
+          <Pressable
+            style={styles.sectionCard}
+            onPress={handleReset}
+            sound={SOUNDS.BUTTON_CLICK}>
+            <LinearGradient
+              style={styles.sectionGradient}
+              colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 1}}>
+              <View style={styles.sectionContent}>
+                <FontAwesome6
+                  name="arrow-rotate-left"
+                  size={20}
+                  color={colors.white}
+                  style={styles.sectionIcon}
+                />
+                <EQText style={styles.sectionText}>Reset</EQText>
               </View>
             </LinearGradient>
           </Pressable>
