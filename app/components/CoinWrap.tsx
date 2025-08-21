@@ -11,19 +11,15 @@ import {fonts} from '../constants/fonts';
 import {useAppSelector} from '../hooks/useAppSelector';
 import CoinSvg from './CoinSvg';
 import {EQText} from './EQText';
+import {formatCoinCount} from '../utils/helpers';
 
 export const CoinWrap = () => {
   const coinCount = useAppSelector(state => state.userData.coin);
 
-  const formattedCoinCount = useMemo(() => {
-    if (coinCount >= 1000000) {
-      return `${(coinCount / 1000000).toFixed(1)}M`;
-    }
-    if (coinCount >= 1000) {
-      return `${(coinCount / 1000).toFixed(2)}K`;
-    }
-    return coinCount.toString();
-  }, [coinCount]);
+  const formattedCoinCount = useMemo(
+    () => formatCoinCount(coinCount).toString(),
+    [coinCount],
+  );
 
   // Animation: scale up and back down when coinCount changes
   const scale = useSharedValue(1);

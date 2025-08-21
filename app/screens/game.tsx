@@ -1,31 +1,30 @@
-import React, {useRef, useState} from 'react';
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {RouteProp, useRoute} from '@react-navigation/native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Dimensions, StyleSheet, View} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import CoinSvg from '../components/CoinSvg';
+import {EQText} from '../components/EQText';
 import {GameHeader} from '../components/GameHeader';
 import {GameTimer} from '../components/GameTimer';
+import {Pressable} from '../components/Pressable';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
-import {GameContainer} from '../containers/GameContainer';
-import {useAppDispatch} from '../store';
-import {
-  buyClearBoard,
-  buySolve,
-  buyUndo,
-  incrementLevel,
-  resetLevel,
-} from '../store/slicers/user.slice';
 import {CLEAR_COST, SOLVE_COST, UNDO_COST} from '../constants/game';
+import {GameContainer} from '../containers/GameContainer';
+import {Level, SOUNDS} from '../models/game';
+import {useAppDispatch} from '../store';
+import {buyClearBoard, buySolve, buyUndo} from '../store/slicers/user.slice';
 
 const {width} = Dimensions.get('window');
 
+interface GameRouteParams {
+  level?: Level;
+  endless?: boolean;
+}
+
 export const GameScreen = () => {
   const dispatch = useAppDispatch();
+  const route = useRoute<RouteProp<{params: GameRouteParams}>>();
 
   const [solving, setSolving] = useState(false);
   const boardRef = useRef<{
@@ -34,13 +33,9 @@ export const GameScreen = () => {
     clearBoard: () => boolean;
   }>(null);
 
-  const handleNextLevel = () => {
-    dispatch(incrementLevel());
-  };
-
-  const handleReset = () => {
-    dispatch(resetLevel());
-  };
+  useEffect(() => {
+    setSolving(false);
+  }, [route.params?.level]);
 
   const handleSolve = () => {
     if (boardRef.current) {
@@ -49,7 +44,6 @@ export const GameScreen = () => {
         if (solved) {
           dispatch(buySolve());
         }
-        setSolving(false);
       });
     }
   };
@@ -74,55 +68,70 @@ export const GameScreen = () => {
 
   return (
     <View style={styles.container}>
-      <GameHeader />
+      <GameHeader level={route?.params?.level?.id} />
       <View style={styles.gameContainer}>
-        <GameTimer />
-        <GameContainer ref={boardRef} />
-        {/* Action Buttons Row */}
+        {route.params?.endless && <GameTimer />}
+        <GameContainer ref={boardRef} level={route.params?.level} />
         <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.resetButton]}
-            onPress={handleClear}>
-            <Text style={styles.actionButtonText}>Clear</Text>
-            <View style={styles.costContainer}>
-              <CoinSvg width={14} height={14} />
-              <Text style={styles.costText}>{CLEAR_COST}</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.actionButton, styles.undoButton]}
-            onPress={handleUndo}>
-            <Text style={styles.actionButtonText}>Undo</Text>
-            <View style={styles.costContainer}>
-              <CoinSvg width={14} height={14} />
-              <Text style={styles.costText}>{UNDO_COST}</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              styles.clueButton,
-              solving && styles.disabledButton,
-            ]}
+          <Pressable
+            style={styles.resetButton}
+            onPress={handleClear}
             disabled={solving}
-            onPress={handleSolve}>
-            <Text style={styles.actionButtonText}>{'Solve'}</Text>
-            <View style={styles.costContainer}>
-              <CoinSvg width={14} height={14} />
-              <Text style={styles.costText}>{SOLVE_COST}</Text>
-            </View>
-          </TouchableOpacity>
+            sound={SOUNDS.BUTTON_CLICK}>
+            <LinearGradient
+              colors={['#FF6B35', '#E55A2B']}
+              style={[
+                styles.actionButton,
+                styles.resetButton,
+                solving && styles.disabledButton,
+              ]}>
+              <EQText style={styles.actionButtonText}>Clear</EQText>
+              <View style={styles.costContainer}>
+                <CoinSvg width={14} height={14} />
+                <EQText style={styles.costText}>{CLEAR_COST}</EQText>
+              </View>
+            </LinearGradient>
+          </Pressable>
+          <Pressable
+            style={styles.undoButton}
+            onPress={handleUndo}
+            disabled={solving}
+            sound={SOUNDS.BUTTON_CLICK}>
+            <LinearGradient
+              colors={['#6366F1', '#4F46E5']}
+              style={[
+                styles.actionButton,
+                styles.undoButton,
+                solving && styles.disabledButton,
+              ]}>
+              <EQText style={styles.actionButtonText}>Undo</EQText>
+              <View style={styles.costContainer}>
+                <CoinSvg width={14} height={14} />
+                <EQText style={styles.costText}>{UNDO_COST}</EQText>
+              </View>
+            </LinearGradient>
+          </Pressable>
+
+          <Pressable
+            style={styles.clueButton}
+            disabled={solving}
+            onPress={handleSolve}
+            sound={SOUNDS.BUTTON_CLICK}>
+            <LinearGradient
+              colors={['#10B981', '#059669']}
+              style={[
+                styles.actionButton,
+                styles.clueButton,
+                solving && styles.disabledButton,
+              ]}>
+              <EQText style={styles.actionButtonText}>{'Solve'}</EQText>
+              <View style={styles.costContainer}>
+                <CoinSvg width={14} height={14} />
+                <EQText style={styles.costText}>{SOLVE_COST}</EQText>
+              </View>
+            </LinearGradient>
+          </Pressable>
         </View>
-        <TouchableOpacity
-          style={styles.buttonContainer}
-          onPress={handleNextLevel}>
-          <Text style={styles.buttonText}>Next Level</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.buttonContainer2} onPress={handleReset}>
-          <Text style={styles.buttonText}>Reset Level</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -222,7 +231,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   actionButton: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -233,13 +241,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   resetButton: {
-    borderColor: colors.orange,
+    borderColor: '#E55A2B',
   },
   undoButton: {
-    borderColor: colors.gray,
+    borderColor: '#4F46E5',
   },
   clueButton: {
-    borderColor: colors.indigo,
+    borderColor: '#059669',
   },
   disabledButton: {
     opacity: 0.5,

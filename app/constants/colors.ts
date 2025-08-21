@@ -55,5 +55,3 @@ export const darkColors = {
   border: colors.darkBorder,
   ...colors,
 };
-
-export const BOARD_COLOR = colors.premiumPink;

@@ -10,11 +10,12 @@ import {
   BACKGROUND_ANIMATION_DURATION,
   SCALE_ANIMATION_DURATION,
 } from '../constants/animations';
-import {BOARD_COLOR, colors} from '../constants/colors';
+import {colors} from '../constants/colors';
 import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import React, {useMemo} from 'react';
 import {EQText} from './EQText';
 import {fonts} from '../constants/fonts';
+import {useAppSelector} from '../hooks/useAppSelector';
 
 const WALL_HW = 4;
 
@@ -39,6 +40,7 @@ export const Cell = React.memo(
     cellWalls,
   }: CellProps) => {
     const scale = useSharedValue(1);
+    const pathColor = useAppSelector(state => state.userData.pathColor);
 
     const cellKey = useMemo(() => `${row}-${col}`, [row, col]);
 
@@ -81,7 +83,7 @@ export const Cell = React.memo(
       const active = isDragged && !firstNumberToDrag;
       return {
         backgroundColor: withTiming(
-          active ? `${BOARD_COLOR}50` : 'rgba(255, 255, 255, 0.1)',
+          active ? `${pathColor}50` : 'rgba(255, 255, 255, 0.1)',
           {duration: BACKGROUND_ANIMATION_DURATION},
         ),
       };
@@ -104,7 +106,7 @@ export const Cell = React.memo(
             scale: scale.value,
           },
         ],
-        backgroundColor: withTiming(isDragged ? BOARD_COLOR : colors.white, {
+        backgroundColor: withTiming(isDragged ? pathColor : colors.white, {
           duration: BACKGROUND_ANIMATION_DURATION,
         }),
       };

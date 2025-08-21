@@ -1,4 +1,4 @@
-import {WALL_SIDE} from '../constants/enums';
+import {ELevelDifficulty, WALL_SIDE} from '../models/game';
 
 export interface NumberedCell {
   row: number;
@@ -14,7 +14,7 @@ export interface Wall {
 export interface Level {
   gridSize: number;
   numberedCells: NumberedCell[];
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: ELevelDifficulty;
   solutionPath: Array<[number, number]>;
   seed: number;
   walls: Wall[];
@@ -28,42 +28,71 @@ type DifficultyConfig = {
   retryAttempts: number;
   wallCount: number;
   wallProbability: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: ELevelDifficulty;
 };
 
-const DIFFICULTY_CONFIGS: Record<'easy' | 'medium' | 'hard', DifficultyConfig> =
-  {
-    easy: {
-      gridSize: 6,
-      minDotCount: 3,
-      maxDotCount: 7,
-      minSpacing: 2,
-      retryAttempts: 100,
-      wallCount: 4, // Maximum possible walls for easy mode
-      wallProbability: 0.2, // 20% chance per potential wall location
-      difficulty: 'easy',
-    },
-    medium: {
-      gridSize: 8,
-      minDotCount: 4,
-      maxDotCount: 8,
-      minSpacing: 4,
-      retryAttempts: 100,
-      wallCount: 9,
-      wallProbability: 0.4,
-      difficulty: 'medium',
-    },
-    hard: {
-      gridSize: 10,
-      minDotCount: 7,
-      maxDotCount: 7,
-      minSpacing: 8,
-      retryAttempts: 100,
-      wallCount: 16,
-      wallProbability: 0.5,
-      difficulty: 'hard',
-    },
-  };
+const DIFFICULTY_CONFIGS = {
+  baby: {
+    gridSize: 4,
+    minDotCount: 2,
+    maxDotCount: 5,
+    minSpacing: 1,
+    retryAttempts: 100,
+    wallCount: 2,
+    wallProbability: 0.1,
+    difficulty: ELevelDifficulty.BABY,
+  },
+  child: {
+    gridSize: 5,
+    minDotCount: 3,
+    maxDotCount: 6,
+    minSpacing: 2,
+    retryAttempts: 100,
+    wallCount: 3,
+    wallProbability: 0.2,
+    difficulty: ELevelDifficulty.CHILD,
+  },
+  easy: {
+    gridSize: 6,
+    minDotCount: 3,
+    maxDotCount: 7,
+    minSpacing: 2,
+    retryAttempts: 100,
+    wallCount: 4, // Maximum possible walls for easy mode
+    wallProbability: 0.3, // 30% chance per potential wall location
+    difficulty: ELevelDifficulty.EASY,
+  },
+  normal: {
+    gridSize: 7,
+    minDotCount: 4,
+    maxDotCount: 8,
+    minSpacing: 3,
+    retryAttempts: 100,
+    wallCount: 6,
+    wallProbability: 0.35,
+    difficulty: ELevelDifficulty.NORMAL,
+  },
+  medium: {
+    gridSize: 8,
+    minDotCount: 4,
+    maxDotCount: 8,
+    minSpacing: 4,
+    retryAttempts: 100,
+    wallCount: 9,
+    wallProbability: 0.4,
+    difficulty: ELevelDifficulty.MEDIUM,
+  },
+  hard: {
+    gridSize: 10,
+    minDotCount: 7,
+    maxDotCount: 7,
+    minSpacing: 8,
+    retryAttempts: 100,
+    wallCount: 16,
+    wallProbability: 0.5,
+    difficulty: ELevelDifficulty.HARD,
+  },
+};
 
 class SeededRandom {
   private seed: number;
@@ -399,7 +428,7 @@ const generateWalls = (
 };
 
 export const generateLevel = (
-  difficulty: 'easy' | 'medium' | 'hard' = 'medium',
+  difficulty: ELevelDifficulty = ELevelDifficulty.MEDIUM,
   seed?: number,
   maxAttempts: number = 5,
 ): Level => {
@@ -466,11 +495,11 @@ export const generateDailyLevel = (): Level => {
   const today = new Date();
   const seed =
     today.getDate() + today.getMonth() * 31 + today.getFullYear() * 365;
-  return generateLevel('easy', seed); // Start with easy for daily levels
+  return generateLevel(ELevelDifficulty.EASY, seed);
 };
 
 export const generateRandomLevel = (
-  difficulty: 'easy' | 'medium' | 'hard' = 'medium',
+  difficulty: ELevelDifficulty = ELevelDifficulty.MEDIUM,
 ): Level => {
   return generateLevel(difficulty);
 };
@@ -511,14 +540,14 @@ export const formatLevel = (level: Level) => {
   };
 };
 
-export const getDifficulty = (
-  currentLevel: number,
-): 'easy' | 'medium' | 'hard' => {
+export const getDifficulty = (currentLevel: number): ELevelDifficulty => {
   if (currentLevel < 20) {
-    return 'easy';
+    return ELevelDifficulty.CHILD;
+  } else if (currentLevel < 30) {
+    return ELevelDifficulty.EASY;
   } else if (currentLevel < 40) {
-    return 'medium';
+    return ELevelDifficulty.MEDIUM;
   } else {
-    return 'hard';
+    return ELevelDifficulty.HARD;
   }
 };

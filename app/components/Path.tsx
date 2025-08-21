@@ -12,7 +12,8 @@ import Svg, {
   Stop,
   Path as SvgPath,
 } from 'react-native-svg';
-import {BOARD_COLOR, colors} from '../constants/colors';
+import {colors} from '../constants/colors';
+import {useAppSelector} from '../hooks/useAppSelector';
 
 export interface PathHandle {
   updatePathData: (path: string) => void;
@@ -27,10 +28,12 @@ interface PathProps {
 
 const PathComponent = forwardRef<PathHandle, PathProps>(
   ({size, cellSize}, ref) => {
-    const [moves, setMoves] = useState<string[]>([]);
+    const pathColor = useAppSelector(state => state.userData.pathColor);
+    const currentPathMoves = useAppSelector(
+      state => state.userData.currentPathMoves,
+    );
+    const [moves, setMoves] = useState<string[]>(currentPathMoves ?? []);
     const pathDataState = moves.length > 0 ? moves[moves.length - 1] : '';
-
-    console.log('pathDataState', pathDataState);
 
     const updatePathData = (path: string) => {
       setMoves(prevMoves => [...prevMoves, path]);
@@ -60,7 +63,7 @@ const PathComponent = forwardRef<PathHandle, PathProps>(
       left: 0,
       width: size * cellSize,
       height: size * cellSize,
-      shadowColor: BOARD_COLOR,
+      shadowColor: pathColor,
       shadowOpacity: 0.8,
       shadowRadius: 16,
     };
@@ -69,14 +72,15 @@ const PathComponent = forwardRef<PathHandle, PathProps>(
       <Svg style={svgStyle} width={size * cellSize} height={size * cellSize}>
         <Defs>
           <LinearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="0%" stopColor={BOARD_COLOR} stopOpacity={0.8} />
+            <Stop offset="0%" stopColor={pathColor} stopOpacity={0.8} />
             <Stop offset="50%" stopColor={colors.white} stopOpacity={1} />
-            <Stop offset="100%" stopColor={BOARD_COLOR} stopOpacity={0.8} />
+            <Stop offset="100%" stopColor={pathColor} stopOpacity={0.8} />
           </LinearGradient>
         </Defs>
         <SvgPath
           d={pathDataState}
-          stroke={BOARD_COLOR}
+          //stroke="url(#pathGradient)"
+          stroke={pathColor}
           strokeWidth={cellSize * 0.25}
           strokeLinecap="round"
           strokeLinejoin="round"

@@ -1,36 +1,45 @@
 import React from 'react';
 import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  ScrollView,
   Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import {CoinWrap} from '../components/CoinWrap';
 import {EQText} from '../components/EQText';
+import {HowToPlayModal} from '../components/HowToPlayModal';
+import {Pressable} from '../components/Pressable';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {useAppNavigation} from '../hooks/useAppNavigation';
-import {SCREENS} from '../navigation/screens';
-import {CoinWrap} from '../components/CoinWrap';
 import {useBottomSheet} from '../hooks/useBottomsheet';
-import {HowToPlayModal} from '../components/HowToPlayModal';
+import {SOUNDS} from '../models/game';
+import {SCREENS} from '../navigation/screens';
+import {getCurrentLevel} from '../utils/helpers';
+import {StartButton} from '../components/StartButton';
 
 export const DashboardScreen = () => {
   const navigation = useAppNavigation();
   const {expand} = useBottomSheet();
 
-  const handleProfilePress = () => {
-    navigation.navigate(SCREENS.PROFILE);
+  const handleLevelsPress = () => {
+    navigation.navigate(SCREENS.LEVEL_ENTRANCE);
   };
 
-  const handleLeaderboardPress = () => {
-    navigation.navigate(SCREENS.LEADERBOARD);
+  const handleMarketplacePress = () => {
+    navigation.navigate(SCREENS.MARKETPLACE);
+  };
+
+  const handleThemePress = () => {
+    navigation.navigate(SCREENS.THEMES);
   };
 
   const startGame = () => {
-    navigation.navigate(SCREENS.GAME);
+    const level = getCurrentLevel();
+    navigation.navigate(SCREENS.GAME, {level});
   };
 
   const handleHowToPlay = () => {
@@ -47,6 +56,7 @@ export const DashboardScreen = () => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.howToPlayButton}
+          activeOpacity={0.7}
           onPress={handleHowToPlay}>
           <EQText style={styles.howToPlayText}>How to Play</EQText>
         </TouchableOpacity>
@@ -66,7 +76,11 @@ export const DashboardScreen = () => {
           </EQText>
         </View>
         <View style={styles.startGameContainer}>
-          <TouchableOpacity style={styles.startGameButton} onPress={startGame}>
+          <StartButton startGame={startGame} />
+          {/* <Pressable
+            style={styles.startGameButton}
+            onPress={startGame}
+            sound={SOUNDS.BUTTON_CLICK}>
             <LinearGradient
               style={styles.startGameGradient}
               colors={[colors.gradientStart, colors.gradientEnd]}
@@ -82,12 +96,13 @@ export const DashboardScreen = () => {
                 <EQText style={styles.startGameText}>Start Game</EQText>
               </View>
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable> */}
         </View>
         <View style={styles.additionalSectionsContainer}>
-          <TouchableOpacity
+          <Pressable
             style={styles.sectionCard}
-            onPress={() => navigation.navigate(SCREENS.GAME_FINISH)}>
+            onPress={handleLevelsPress}
+            sound={SOUNDS.BUTTON_CLICK}>
             <LinearGradient
               style={styles.sectionGradient}
               colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
@@ -103,10 +118,11 @@ export const DashboardScreen = () => {
                 <EQText style={styles.sectionText}>Levels</EQText>
               </View>
             </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             style={styles.sectionCard}
-            onPress={() => navigation.navigate(SCREENS.MARKETPLACE)}>
+            onPress={handleMarketplacePress}
+            sound={SOUNDS.BUTTON_CLICK}>
             <LinearGradient
               style={styles.sectionGradient}
               colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
@@ -122,10 +138,11 @@ export const DashboardScreen = () => {
                 <EQText style={styles.sectionText}>Marketplace</EQText>
               </View>
             </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             style={styles.sectionCard}
-            onPress={handleLeaderboardPress}>
+            onPress={handleThemePress}
+            sound={SOUNDS.BUTTON_CLICK}>
             <LinearGradient
               style={styles.sectionGradient}
               colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
@@ -133,34 +150,15 @@ export const DashboardScreen = () => {
               end={{x: 1, y: 1}}>
               <View style={styles.sectionContent}>
                 <FontAwesome6
-                  name="trophy"
+                  name="palette"
                   size={20}
                   color={colors.white}
                   style={styles.sectionIcon}
                 />
-                <EQText style={styles.sectionText}>Leaderboard</EQText>
+                <EQText style={styles.sectionText}>Themes</EQText>
               </View>
             </LinearGradient>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.sectionCard}
-            onPress={handleProfilePress}>
-            <LinearGradient
-              style={styles.sectionGradient}
-              colors={['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 1}}>
-              <View style={styles.sectionContent}>
-                <FontAwesome6
-                  name="user"
-                  size={20}
-                  color={colors.white}
-                  style={styles.sectionIcon}
-                />
-                <EQText style={styles.sectionText}>View Profile</EQText>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
           <TouchableOpacity style={styles.achievementCard}>
             <LinearGradient
               style={styles.achievementGradient}
@@ -193,7 +191,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    padding: 12,
+    padding: 18,
     paddingTop: 75,
     width: '100%',
     backgroundColor: colors.black,
@@ -252,7 +250,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   startGameContainer: {
-    width: '100%',
     marginTop: 20,
   },
   startGameButton: {

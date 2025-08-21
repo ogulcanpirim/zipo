@@ -6,29 +6,16 @@ import CoinSvg from '../components/CoinSvg';
 import {EQText} from '../components/EQText';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
-import {useAppNavigation} from '../hooks/useAppNavigation';
+import {Header} from '../components/Header';
 
 export const MarketplaceScreen = () => {
-  const navigation = useAppNavigation();
-
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
-
   const handleItemPress = (item: string) => {
     console.log(`Item pressed: ${item}`);
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
-          <FontAwesome6 name="arrow-left" size={20} color={colors.white} />
-        </TouchableOpacity>
-        <EQText style={styles.headerTitle}>Marketplace</EQText>
-        <View style={styles.placeholder} />
-      </View>
-
+      <Header title="Marketplace" />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Featured Items Section */}
         <View style={styles.section}>

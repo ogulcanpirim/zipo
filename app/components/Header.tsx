@@ -1,44 +1,27 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import {CoinWrap} from '../components/CoinWrap';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import {useAppNavigation} from '../hooks/useAppNavigation';
-import {useAppSelector} from '../hooks/useAppSelector';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
 import {useSound} from '../hooks/useSound';
 import {SOUNDS} from '../models/game';
 
-const POP_ANIMATION_DURATION = 150;
-
-interface GameHeaderProps {
-  level?: number;
+interface HeaderProps {
+  title: string;
+  onBackPress?: () => void;
 }
 
-export const GameHeader = ({level}: GameHeaderProps) => {
+export const Header = ({title, onBackPress}: HeaderProps) => {
   const navigation = useAppNavigation();
-  const currentLevel = useAppSelector(state => state.userData.currentLevel);
   const {play} = useSound();
-  const scale = useSharedValue(1);
-
-  useEffect(() => {
-    scale.value = withSequence(
-      withTiming(1.3, {duration: POP_ANIMATION_DURATION}),
-      withTiming(1, {duration: POP_ANIMATION_DURATION}),
-    );
-  }, [currentLevel, scale]);
-
-  const animatedLevelStyle = useAnimatedStyle(() => ({
-    transform: [{scale: scale.value}],
-  }));
 
   const handleBackPress = () => {
+    if (onBackPress) {
+      onBackPress();
+      return;
+    }
     navigation.goBack();
   };
 
@@ -50,14 +33,12 @@ export const GameHeader = ({level}: GameHeaderProps) => {
     <View style={styles.header}>
       <TouchableOpacity
         style={styles.backButton}
-        onPress={handleBackPress}
         onPressIn={onPressIn}
+        onPress={handleBackPress}
         hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}>
-        <FontAwesome6Icon name="chevron-left" size={20} color={colors.white} />
+        <FontAwesome6Icon name="chevron-left" size={18} color={colors.white} />
       </TouchableOpacity>
-      <Animated.View style={animatedLevelStyle}>
-        <Text style={styles.levelText}>{`Level ${level ?? currentLevel}`}</Text>
-      </Animated.View>
+      <Text style={styles.title}>{title}</Text>
       <View style={styles.coinWrapper}>
         <CoinWrap />
       </View>
@@ -71,14 +52,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    marginTop: 60,
+    paddingTop: 70,
+    paddingBottom: 15,
+    backgroundColor: colors.darkBackground,
   },
   backButton: {
     position: 'absolute',
-    left: 20,
+    left: 25,
+    bottom: 18,
   },
-  levelText: {
-    fontSize: 20,
+  title: {
+    fontSize: 18,
     color: colors.white,
     textAlign: 'center',
     fontFamily: fonts.bold,
@@ -86,5 +70,6 @@ const styles = StyleSheet.create({
   coinWrapper: {
     position: 'absolute',
     right: 20,
+    bottom: 16,
   },
 });

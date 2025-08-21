@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import {Dimensions, StyleSheet} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -28,6 +29,8 @@ import {
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import {useAppNavigation} from '../hooks/useAppNavigation';
+import {useSound} from '../hooks/useSound';
+import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 
 const {width} = Dimensions.get('window');
@@ -37,10 +40,11 @@ export interface BoardProps {
   numbers: Array<[number, number, number]>;
   walls: Array<[number, number, number]>;
   solvePath: Array<[number, number]>;
+  rewardCoin: number;
 }
 
 const BoardComponent = forwardRef(
-  ({size, numbers, walls, solvePath}: BoardProps, ref) => {
+  ({size, numbers, walls, solvePath, rewardCoin}: BoardProps, ref) => {
     const navigation = useAppNavigation();
     const pathRef = useRef<PathHandle>(null);
 
@@ -52,11 +56,13 @@ const BoardComponent = forwardRef(
     const boardScale = useSharedValue(1);
     const moves = useSharedValue<number[]>([]);
     const moveInGesture = useSharedValue(0);
+    const solving = useSharedValue(false);
 
     const snapRef = useRef<any>();
 
-    const cellSize = Math.min(width - 20, 375) / size;
+    const cellSize = useMemo(() => Math.min(width - 20, 375) / size, [size]);
     const gameFinished = useSharedValue(false);
+    const {play} = useSound();
 
     const handleClearPath = () => {
       if (pathRef.current?.clearPath) {
@@ -72,7 +78,6 @@ const BoardComponent = forwardRef(
       isDragging.value = false;
       draggedCells.value = [];
       addedCells.value = [];
-      boardShake.value = 0;
       gameFinished.value = false;
       moves.value = [];
       moveInGesture.value = 0;
@@ -90,18 +95,27 @@ const BoardComponent = forwardRef(
       resetGame();
     }, [numbers, resetGame]);
 
-    const maxNumberLocation = useMemo(() => {
-      let max = 0;
-      let row = 0,
-        col = 0;
-      for (const [r, c, value] of numbers) {
-        if (value > max) {
-          max = value;
-          row = r;
-          col = c;
-        }
-      }
-      return {row, col};
+    const numberLocations = useMemo(() => {
+      const {min, max} = numbers.reduce(
+        (acc, [r, c, value]) => {
+          if (value > acc.max.value) {
+            acc.max = {row: r, col: c, value};
+          }
+          if (value < acc.min.value) {
+            acc.min = {row: r, col: c, value};
+          }
+          return acc;
+        },
+        {
+          min: {row: 0, col: 0, value: Infinity},
+          max: {row: 0, col: 0, value: -Infinity},
+        },
+      );
+
+      return {
+        min: {row: min.row, col: min.col},
+        max: {row: max.row, col: max.col},
+      };
     }, [numbers]);
 
     const getCellAtPosition = (x: number, y: number) => {
@@ -160,6 +174,7 @@ const BoardComponent = forwardRef(
     };
 
     const updatePathData = (path: string) => {
+      ReactNativeHapticFeedback.trigger('impactLight');
       pathRef.current?.updatePathData?.(path);
     };
 
@@ -171,6 +186,7 @@ const BoardComponent = forwardRef(
       if (!solvePath || solvePath.length === 0) {
         return false;
       }
+      solving.value = true;
 
       let newDraggedCells: string[] = [];
       let newAddedCells: string[] = [];
@@ -243,24 +259,42 @@ const BoardComponent = forwardRef(
         const lastCellKey = draggedCells.value[draggedCells.value.length - 1];
         const [lastRow, lastCol] = lastCellKey.split('-').map(Number);
         return (
-          maxNumberLocation.row === lastRow && maxNumberLocation.col === lastCol
+          numberLocations.max.row === lastRow &&
+          numberLocations.max.col === lastCol
         );
       }
+    };
+
+    const isFirstDraggedCellNumber = () => {
+      'worklet';
+      if (draggedCells.value.length > 0) {
+        const firstCellKey = draggedCells.value[0];
+        const [firstRow, firstCol] = firstCellKey.split('-').map(Number);
+        return (
+          numberLocations.min.row === firstRow &&
+          numberLocations.min.col === firstCol
+        );
+      }
+      return false;
     };
 
     const isGameFinished = () => {
       'worklet';
       const sortedAddedCells = [...addedCells.value].sort();
       const isLastCellNumber = isLastDraggedCellNumber();
+      const isFirstCellNumber = isFirstDraggedCellNumber();
       const isEqual =
         JSON.stringify(sortedAddedCells) === JSON.stringify(addedCells.value);
       return (
-        draggedCells.value.length === size * size && isEqual && isLastCellNumber
+        draggedCells.value.length === size * size &&
+        isEqual &&
+        isLastCellNumber &&
+        isFirstCellNumber
       );
     };
 
     const shakeBoard = () => {
-      'worklet';
+      runOnJS(play)(SOUNDS.ERROR);
       boardShake.value = withSequence(
         withTiming(SHAKE_OFFSET, {duration: SHAKE_DURATION}),
         withTiming(-SHAKE_OFFSET, {duration: SHAKE_DURATION}),
@@ -274,29 +308,29 @@ const BoardComponent = forwardRef(
     const captureBoard = () => {
       setTimeout(() => {
         snapRef?.current?.capture?.().then((uri: string) => {
-          console.log('uri:', uri);
+          solving.value = false;
           navigation.navigate(SCREENS.GAME_FINISH, {
             imageUri: uri,
+            rewardCoin: rewardCoin,
           });
         });
       }, 100);
     };
 
     const directToWin = () => {
-      console.log('directToWin called');
       gameFinished.value = true;
       runOnJS(captureBoard)();
     };
 
     const winAnimation = () => {
       'worklet';
+      runOnJS(play)(SOUNDS.SUCCESS);
       boardScale.value = withSequence(
         withTiming(1.05, {duration: BOARD_SCALE_DURATION}),
         withTiming(1, {duration: BOARD_SCALE_DURATION}),
         withTiming(1.05, {duration: BOARD_SCALE_DURATION}),
         withTiming(1, {duration: BOARD_SCALE_DURATION}, finished => {
           if (finished) {
-            console.log('buraya gelecek !');
             gameFinished.value = true;
             runOnJS(directToWin)();
           }
@@ -315,7 +349,7 @@ const BoardComponent = forwardRef(
         winAnimation();
       } else if (isBoardFilled()) {
         runOnJS(clearBoard)();
-        shakeBoard();
+        runOnJS(shakeBoard)();
       }
     };
 
@@ -342,7 +376,7 @@ const BoardComponent = forwardRef(
     const tapGesture = Gesture.Tap()
       .onStart(event => {
         'worklet';
-        if (gameFinished.value || !isDragging.value) {
+        if (gameFinished.value || !isDragging.value || solving.value) {
           return;
         }
         const cell = getCellAtPosition(event.x, event.y);
@@ -375,6 +409,9 @@ const BoardComponent = forwardRef(
       })
       .onEnd(() => {
         'worklet';
+        if (solving.value || gameFinished.value) {
+          return;
+        }
         if (moveInGesture.value > 0) {
           moves.value.push(moveInGesture.value);
           moveInGesture.value = 0;
@@ -385,6 +422,9 @@ const BoardComponent = forwardRef(
     const panGesture = Gesture.Pan()
       .onBegin(event => {
         'worklet';
+        if (solving.value) {
+          return;
+        }
         const cell = getCellAtPosition(event.x, event.y);
         if (moves.value.length === 0 && cell) {
           draggedCells.value = [
@@ -396,10 +436,7 @@ const BoardComponent = forwardRef(
       })
       .onStart(event => {
         'worklet';
-        if (isDragging.value) {
-          return;
-        }
-        if (gameFinished.value) {
+        if (isDragging.value || gameFinished.value || solving.value) {
           return;
         }
         const cell = getCellAtPosition(event.x, event.y);
@@ -409,7 +446,7 @@ const BoardComponent = forwardRef(
       })
       .onChange(event => {
         'worklet';
-        if (gameFinished.value) {
+        if (gameFinished.value || solving.value) {
           return;
         }
 
@@ -451,7 +488,7 @@ const BoardComponent = forwardRef(
       })
       .onEnd(() => {
         'worklet';
-        if (gameFinished.value) {
+        if (gameFinished.value || solving.value) {
           return;
         }
         moves.value.push(moveInGesture.value);

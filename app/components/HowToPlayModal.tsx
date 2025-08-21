@@ -1,14 +1,17 @@
 import React from 'react';
 import {StyleSheet, View, ViewStyle} from 'react-native';
 import {EQText} from './EQText';
-import {BOARD_COLOR, colors} from '../constants/colors';
+import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import Svg, {Path} from 'react-native-svg';
+import {useAppSelector} from '../hooks/useAppSelector';
 
 const GRID_SIZE = 3;
 const GRID_ITEMS = Array.from({length: GRID_SIZE * GRID_SIZE}, (_, i) => i);
 
 export const HowToPlayModal = () => {
+  const pathColor = useAppSelector(state => state.userData.pathColor);
+
   const getGridCellStyle = (index: number): ViewStyle => {
     return {
       borderTopLeftRadius: index === 0 ? 8 : 0,
@@ -20,18 +23,18 @@ export const HowToPlayModal = () => {
 
   return (
     <View style={styles.modalContainer}>
-      <EQText style={styles.modalTitle}>How to Play</EQText>
+      <EQText style={styles.modalTitle}>How to Play ?</EQText>
       <View style={styles.items}>
         <View style={styles.leftContainer}>
           <View style={styles.cells}>
-            <View style={styles.line} />
-            <View style={styles.cell}>
+            <View style={[styles.line, {backgroundColor: pathColor}]} />
+            <View style={[styles.cell, {borderColor: pathColor}]}>
               <EQText style={styles.cellText}>1</EQText>
             </View>
-            <View style={styles.cell}>
+            <View style={[styles.cell, {borderColor: pathColor}]}>
               <EQText style={styles.cellText}>2</EQText>
             </View>
-            <View style={styles.cell}>
+            <View style={[styles.cell, {borderColor: pathColor}]}>
               <EQText style={styles.cellText}>3</EQText>
             </View>
           </View>
@@ -50,12 +53,12 @@ export const HowToPlayModal = () => {
             <Svg
               width={GRID_SIZE * 30}
               height={GRID_SIZE * 30}
-              style={styles.svgStyle}
+              style={[styles.svgStyle, {shadowColor: pathColor}]}
               viewBox={`0 0 ${GRID_SIZE * 30} ${GRID_SIZE * 30}`}>
               <Path
                 d="M15 17.5 L15 75 M15 75 L45 75 L45 17.5 L75 17.5 L75 75"
                 fill="none"
-                stroke={BOARD_COLOR}
+                stroke={pathColor}
                 strokeWidth={12}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -104,7 +107,6 @@ const styles = StyleSheet.create({
     height: 20,
     left: -11,
     borderRadius: 10,
-    backgroundColor: BOARD_COLOR,
     width: 130,
   },
   cell: {
@@ -115,7 +117,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: BOARD_COLOR,
   },
   cellText: {
     color: colors.white,
@@ -152,6 +153,5 @@ const styles = StyleSheet.create({
     left: 0,
     width: GRID_SIZE * 30,
     height: GRID_SIZE * 30,
-    shadowColor: BOARD_COLOR,
   },
 });
