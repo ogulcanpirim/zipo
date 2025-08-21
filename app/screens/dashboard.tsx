@@ -12,6 +12,7 @@ import {CoinWrap} from '../components/CoinWrap';
 import {EQText} from '../components/EQText';
 import {HowToPlayModal} from '../components/HowToPlayModal';
 import {Pressable} from '../components/Pressable';
+import {StartButton} from '../components/StartButton';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import {useAppNavigation} from '../hooks/useAppNavigation';
@@ -19,12 +20,8 @@ import {useBottomSheet} from '../hooks/useBottomsheet';
 import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 import {getCurrentLevel} from '../utils/helpers';
-import {StartButton} from '../components/StartButton';
-import {useAppDispatch} from '../store';
-import {clearData} from '../store/slicers/user.slice';
 
 export const DashboardScreen = () => {
-  const dispatch = useAppDispatch();
   const navigation = useAppNavigation();
   const {expand} = useBottomSheet();
 
@@ -54,8 +51,8 @@ export const DashboardScreen = () => {
     });
   };
 
-  const handleReset = () => {
-    dispatch(clearData());
+  const handleDevMode = () => {
+    navigation.navigate(SCREENS.DEV_MODE);
   };
 
   return (
@@ -145,7 +142,7 @@ export const DashboardScreen = () => {
           </Pressable>
           <Pressable
             style={styles.sectionCard}
-            onPress={handleReset}
+            onPress={handleDevMode}
             sound={SOUNDS.BUTTON_CLICK}>
             <LinearGradient
               style={styles.sectionGradient}
@@ -154,12 +151,12 @@ export const DashboardScreen = () => {
               end={{x: 1, y: 1}}>
               <View style={styles.sectionContent}>
                 <FontAwesome6
-                  name="arrow-rotate-left"
+                  name="magnifying-glass-chart"
                   size={20}
                   color={colors.white}
                   style={styles.sectionIcon}
                 />
-                <EQText style={styles.sectionText}>Reset</EQText>
+                <EQText style={styles.sectionText}>DEV Mode</EQText>
               </View>
             </LinearGradient>
           </Pressable>

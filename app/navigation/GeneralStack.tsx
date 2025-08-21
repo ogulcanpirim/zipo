@@ -11,6 +11,7 @@ import {MarketplaceScreen} from '../screens/marketplace';
 import {ProfileScreen} from '../screens/profile';
 import {ThemesScreen} from '../screens/themes';
 import {SCREENS} from './screens';
+import {DevModeScreen} from '../screens/devMode';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,7 @@ export const GeneralStack = () => {
         }}
       />
       <Stack.Screen name={SCREENS.THEMES} component={ThemesScreen} />
+      <Stack.Screen name={SCREENS.DEV_MODE} component={DevModeScreen} />
     </Stack.Navigator>
   );
 };
