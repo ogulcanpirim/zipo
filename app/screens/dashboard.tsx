@@ -78,32 +78,9 @@ export const DashboardScreen = () => {
             />
           </View>
           <EQText style={styles.appName}>Zipo</EQText>
-          <EQText style={styles.appTagline}>
-            Master equations, unlock achievements!
-          </EQText>
         </View>
         <View style={styles.startGameContainer}>
           <StartButton startGame={startGame} />
-          {/* <Pressable
-            style={styles.startGameButton}
-            onPress={startGame}
-            sound={SOUNDS.BUTTON_CLICK}>
-            <LinearGradient
-              style={styles.startGameGradient}
-              colors={[colors.gradientStart, colors.gradientEnd]}
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 0}}>
-              <View style={styles.startGameContent}>
-                <FontAwesome6
-                  name="play"
-                  size={20}
-                  color={colors.white}
-                  style={styles.playIcon}
-                />
-                <EQText style={styles.startGameText}>Start Game</EQText>
-              </View>
-            </LinearGradient>
-          </Pressable> */}
         </View>
         <View style={styles.additionalSectionsContainer}>
           <Pressable
@@ -269,11 +246,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     color: colors.white,
     marginBottom: 5,
-    textAlign: 'center',
-  },
-  appTagline: {
-    fontSize: 14,
-    color: colors.white,
     textAlign: 'center',
   },
   startGameContainer: {

@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   levelUnlockedText: {
     fontSize: 18,
     fontFamily: fonts.semiBold,
-    paddingTop: 10,
+    paddingTop: 4,
   },
   earnedCoinContainer: {
     flexDirection: 'row',
