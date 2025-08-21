@@ -8,7 +8,6 @@ import {Pressable} from './Pressable';
 import CoinSvg from './CoinSvg';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
-import {BlurView} from '@react-native-community/blur';
 import {formatCoinCount} from '../utils/helpers';
 import {SOUNDS} from '../models/game';
 import {useAppSelector} from '../hooks/useAppSelector';
@@ -46,33 +45,26 @@ const ThemeCardComponent = ({
   const renderActionButton = () => {
     if (!unlocked) {
       return (
-        <Pressable disabled={disabled} onPress={onPurchase}>
-          <BlurView
-            blurType={'dark'}
-            blurAmount={10}
-            style={styles.purchaseBlur}>
-            <View style={styles.buttonContent}>
-              <CoinSvg width={16} height={16} />
-              <EQText style={styles.buttonText}>
-                {formatCoinCount(price)}
-              </EQText>
-            </View>
-          </BlurView>
+        <Pressable
+          disabled={disabled}
+          onPress={onPurchase}
+          style={styles.newBlur}>
+          <View style={styles.buttonContent}>
+            <CoinSvg width={16} height={16} />
+            <EQText style={styles.buttonText}>{formatCoinCount(price)}</EQText>
+          </View>
         </Pressable>
       );
     }
 
     if (isEquipped) {
       return (
-        <BlurView
-          blurType="light"
-          blurAmount={10}
-          style={styles.equippedButton}>
+        <View style={styles.newEquippedButton}>
           <View style={styles.equippedContent}>
             <FontAwesome6 name="check" size={14} color={colors.white} />
             <EQText style={styles.equippedText}>Equipped</EQText>
           </View>
-        </BlurView>
+        </View>
       );
     }
 
@@ -148,7 +140,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     borderWidth: 1,
-    //borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   cellContainer: {
     flexDirection: 'row',
@@ -204,6 +195,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
   },
+  newEquippedButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
   buttonGradient: {
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -228,6 +227,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fonts.semiBold,
     color: colors.white,
+  },
+  newBlur: {
+    backgroundColor: 'rgba(0,0,0, 0.3)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
   },
 });
 
