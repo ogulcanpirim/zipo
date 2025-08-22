@@ -21,6 +21,7 @@ import {useBottomSheet} from '../hooks/useBottomsheet';
 import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 import {getCurrentLevel} from '../utils/helpers';
+import {LevelWrap} from '../components/LevelWrap';
 
 export const DashboardScreen = () => {
   const navigation = useAppNavigation();
@@ -69,7 +70,10 @@ export const DashboardScreen = () => {
             onPress={handleHowToPlay}>
             <EQText style={styles.howToPlayText}>How to Play</EQText>
           </TouchableOpacity>
-          <CoinWrap />
+          <View style={styles.wrapContainer}>
+            <LevelWrap />
+            <CoinWrap />
+          </View>
         </View>
         <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
           <View style={styles.logoContainer}>
@@ -83,7 +87,8 @@ export const DashboardScreen = () => {
           <View style={styles.introSection}>
             <EQText style={styles.introTitle}>Welcome to Zipo</EQText>
             <EQText style={styles.introSubtitle}>
-              Solve puzzles, unlock levels, and collect coins in this addictive puzzle game
+              Solve puzzles, unlock levels, and collect coins in this addictive
+              puzzle game
             </EQText>
           </View>
           <View style={styles.startGameContainer}>
@@ -201,7 +206,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: 15,
+
     paddingVertical: 10,
     marginBottom: 10,
   },
@@ -216,6 +221,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.white,
     fontFamily: fonts.medium,
+  },
+  wrapContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 32,
   },
   scroll: {
     flex: 1,

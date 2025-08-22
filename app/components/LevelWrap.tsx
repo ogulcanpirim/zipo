@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -9,19 +9,13 @@ import Animated, {
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import {useAppSelector} from '../hooks/useAppSelector';
-import CoinSvg from './CoinSvg';
 import {EQText} from './EQText';
-import {formatCoinCount} from '../utils/helpers';
+import LevelSvg from './LevelSvg';
 
-export const CoinWrap = () => {
-  const coinCount = useAppSelector(state => state.userData.coin);
+export const LevelWrap = () => {
+  const currentLevel = useAppSelector(state => state.userData.currentLevel);
 
-  const formattedCoinCount = useMemo(
-    () => formatCoinCount(coinCount).toString(),
-    [coinCount],
-  );
-
-  // Animation: scale up and back down when coinCount changes
+  // Animation: scale up and back down when currentLevel changes
   const scale = useSharedValue(1);
 
   useEffect(() => {
@@ -29,7 +23,7 @@ export const CoinWrap = () => {
       withTiming(1.15, {duration: 120}),
       withTiming(1, {duration: 120}),
     );
-  }, [coinCount, scale]);
+  }, [currentLevel, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{scale: scale.value}],
@@ -38,9 +32,9 @@ export const CoinWrap = () => {
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
       <View style={styles.coinWrapper}>
-        <CoinSvg width={24} height={24} />
+        <LevelSvg width={24} height={24} />
       </View>
-      <EQText style={styles.coinText}>{formattedCoinCount}</EQText>
+      <EQText style={styles.coinText}>{1321}</EQText>
     </Animated.View>
   );
 };
@@ -50,11 +44,11 @@ const styles = StyleSheet.create({
     backgroundColor: `${colors.white}30`,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: 8,
-    paddingRight: 6,
+    justifyContent: 'center',
     paddingVertical: 2,
     borderTopRightRadius: 8,
     borderBottomRightRadius: 8,
+    minWidth: 40,
   },
   coinText: {
     fontFamily: fonts.bold,
@@ -63,6 +57,6 @@ const styles = StyleSheet.create({
   },
   coinWrapper: {
     position: 'absolute',
-    left: -19,
+    left: -20.5,
   },
 });
