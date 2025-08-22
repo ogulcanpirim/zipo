@@ -1,7 +1,8 @@
 import {RouteProp, useRoute} from '@react-navigation/native';
 import React, {useEffect, useRef, useState} from 'react';
-import {Dimensions, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import {AdBanner} from '../components/AdBanner';
 import CoinSvg from '../components/CoinSvg';
 import {EQText} from '../components/EQText';
 import {GameHeader} from '../components/GameHeader';
@@ -14,9 +15,6 @@ import {GameContainer} from '../containers/GameContainer';
 import {Level, SOUNDS} from '../models/game';
 import {useAppDispatch} from '../store';
 import {buyClearBoard, buySolve, buyUndo} from '../store/slicers/user.slice';
-import {AdBanner} from '../components/AdBanner';
-
-const {width} = Dimensions.get('window');
 
 interface GameRouteParams {
   level?: Level;
