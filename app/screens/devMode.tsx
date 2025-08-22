@@ -6,7 +6,7 @@ import {useAppSelector} from '../hooks/useAppSelector';
 import {EQText} from '../components/EQText';
 import {fonts} from '../constants/fonts';
 import {useAppDispatch} from '../store';
-import {setCoin, setCurrentLevel} from '../store/slicers/user.slice';
+import {clearData, setCoin, setCurrentLevel} from '../store/slicers/user.slice';
 import {Pressable} from '../components/Pressable';
 import {SOUNDS} from '../models/game';
 
@@ -22,6 +22,10 @@ export const DevModeScreen = () => {
     setLevel(currentLevel.toString());
     setNewCoin(currentCoin.toString());
   }, [currentLevel, currentCoin]);
+
+  const handleReset = () => {
+    dispatch(clearData());
+  };
 
   const handleSave = () => {
     if (parseInt(level, 10) <= 1100 && parseInt(coin, 10) > 0) {
@@ -59,6 +63,14 @@ export const DevModeScreen = () => {
           onPress={handleSave}
           sound={SOUNDS.BUTTON_CLICK}>
           <EQText style={styles.saveText}>Save</EQText>
+        </Pressable>
+        <Pressable
+          style={[styles.buttonContainer, {backgroundColor: colors.red}]}
+          onPress={handleReset}
+          sound={SOUNDS.BUTTON_CLICK}>
+          <EQText style={[styles.saveText, {color: colors.white}]}>
+            RESET
+          </EQText>
         </Pressable>
       </View>
     </View>

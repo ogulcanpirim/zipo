@@ -13,6 +13,11 @@ class MainActivity : ReactActivity() {
    */
   override fun getMainComponentName(): String = "zipo"
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    RNBootSplash.init(this, R.style.BootTheme) // ⬅️ initialize the splash screen
+    super.onCreate(savedInstanceState) // super.onCreate(null) with react-native-screens
+  }
+
   /**
    * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
    * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]

@@ -1,13 +1,20 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Provider} from 'react-redux';
-import AppNavigationContainer from './app/navigation/AppNavigation';
-import redux from './app/store';
-import LoaderProvider from './app/providers/LoaderProvider';
 import {PersistGate} from 'redux-persist/integration/react';
+import AnimatedBootsplashContainer from './app/containers/AnimatedBootsplash';
+import AppNavigationContainer from './app/navigation/AppNavigation';
+import LoaderProvider from './app/providers/LoaderProvider';
+import redux from './app/store';
 
 const App = () => {
+  const [visible, setVisible] = useState(true);
+
+  const hideBootsplash = () => {
+    setVisible(false);
+  };
+
   return (
     <GestureHandlerRootView style={styles.flex}>
       <Provider store={redux.store}>
@@ -17,6 +24,9 @@ const App = () => {
           </LoaderProvider>
         </PersistGate>
       </Provider>
+      {visible && (
+        <AnimatedBootsplashContainer onAnimationEnd={hideBootsplash} />
+      )}
     </GestureHandlerRootView>
   );
 };

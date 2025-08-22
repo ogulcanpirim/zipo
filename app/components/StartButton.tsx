@@ -70,7 +70,7 @@ export const StartButton = ({startGame}: StartButtonProps) => {
         sound={SOUNDS.BUTTON_CLICK}>
         <LinearGradient
           style={styles.startGameGradient}
-          colors={[pathColor, `${pathColor}60`]}
+          colors={[pathColor, `${pathColor}80`]}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1}}>
           <View style={styles.startGameContent}>

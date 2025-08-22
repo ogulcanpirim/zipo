@@ -174,10 +174,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.black,
-    gap: 24,
   },
   listContainer: {
     paddingHorizontal: 12,
     paddingBottom: 100,
+    paddingTop: 24,
   },
 });

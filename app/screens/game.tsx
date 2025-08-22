@@ -14,6 +14,7 @@ import {GameContainer} from '../containers/GameContainer';
 import {Level, SOUNDS} from '../models/game';
 import {useAppDispatch} from '../store';
 import {buyClearBoard, buySolve, buyUndo} from '../store/slicers/user.slice';
+import {AdBanner} from '../components/AdBanner';
 
 const {width} = Dimensions.get('window');
 
@@ -67,73 +68,76 @@ export const GameScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <GameHeader level={route?.params?.level?.id} />
-      <View style={styles.gameContainer}>
-        {route.params?.endless && <GameTimer />}
-        <GameContainer ref={boardRef} level={route.params?.level} />
-        <View style={styles.buttonRow}>
-          <Pressable
-            style={styles.resetButton}
-            onPress={handleClear}
-            disabled={solving}
-            sound={SOUNDS.BUTTON_CLICK}>
-            <LinearGradient
-              colors={['#FF6B35', '#E55A2B']}
-              style={[
-                styles.actionButton,
-                styles.resetButton,
-                solving && styles.disabledButton,
-              ]}>
-              <EQText style={styles.actionButtonText}>Clear</EQText>
-              <View style={styles.costContainer}>
-                <CoinSvg width={14} height={14} />
-                <EQText style={styles.costText}>{CLEAR_COST}</EQText>
-              </View>
-            </LinearGradient>
-          </Pressable>
-          <Pressable
-            style={styles.undoButton}
-            onPress={handleUndo}
-            disabled={solving}
-            sound={SOUNDS.BUTTON_CLICK}>
-            <LinearGradient
-              colors={['#6366F1', '#4F46E5']}
-              style={[
-                styles.actionButton,
-                styles.undoButton,
-                solving && styles.disabledButton,
-              ]}>
-              <EQText style={styles.actionButtonText}>Undo</EQText>
-              <View style={styles.costContainer}>
-                <CoinSvg width={14} height={14} />
-                <EQText style={styles.costText}>{UNDO_COST}</EQText>
-              </View>
-            </LinearGradient>
-          </Pressable>
+    <>
+      <View style={styles.container}>
+        <GameHeader level={route?.params?.level?.id} />
+        <View style={styles.gameContainer}>
+          {route.params?.endless && <GameTimer />}
+          <GameContainer ref={boardRef} level={route.params?.level} />
+          <View style={styles.buttonRow}>
+            <Pressable
+              style={styles.resetButton}
+              onPress={handleClear}
+              disabled={solving}
+              sound={SOUNDS.BUTTON_CLICK}>
+              <LinearGradient
+                colors={['#FF6B35', '#E55A2B']}
+                style={[
+                  styles.actionButton,
+                  styles.resetButton,
+                  solving && styles.disabledButton,
+                ]}>
+                <EQText style={styles.actionButtonText}>Clear</EQText>
+                <View style={styles.costContainer}>
+                  <CoinSvg width={14} height={14} />
+                  <EQText style={styles.costText}>{CLEAR_COST}</EQText>
+                </View>
+              </LinearGradient>
+            </Pressable>
+            <Pressable
+              style={styles.undoButton}
+              onPress={handleUndo}
+              disabled={solving}
+              sound={SOUNDS.BUTTON_CLICK}>
+              <LinearGradient
+                colors={['#6366F1', '#4F46E5']}
+                style={[
+                  styles.actionButton,
+                  styles.undoButton,
+                  solving && styles.disabledButton,
+                ]}>
+                <EQText style={styles.actionButtonText}>Undo</EQText>
+                <View style={styles.costContainer}>
+                  <CoinSvg width={14} height={14} />
+                  <EQText style={styles.costText}>{UNDO_COST}</EQText>
+                </View>
+              </LinearGradient>
+            </Pressable>
 
-          <Pressable
-            style={styles.clueButton}
-            disabled={solving}
-            onPress={handleSolve}
-            sound={SOUNDS.BUTTON_CLICK}>
-            <LinearGradient
-              colors={['#10B981', '#059669']}
-              style={[
-                styles.actionButton,
-                styles.clueButton,
-                solving && styles.disabledButton,
-              ]}>
-              <EQText style={styles.actionButtonText}>{'Solve'}</EQText>
-              <View style={styles.costContainer}>
-                <CoinSvg width={14} height={14} />
-                <EQText style={styles.costText}>{SOLVE_COST}</EQText>
-              </View>
-            </LinearGradient>
-          </Pressable>
+            <Pressable
+              style={styles.clueButton}
+              disabled={solving}
+              onPress={handleSolve}
+              sound={SOUNDS.BUTTON_CLICK}>
+              <LinearGradient
+                colors={['#10B981', '#059669']}
+                style={[
+                  styles.actionButton,
+                  styles.clueButton,
+                  solving && styles.disabledButton,
+                ]}>
+                <EQText style={styles.actionButtonText}>{'Solve'}</EQText>
+                <View style={styles.costContainer}>
+                  <CoinSvg width={14} height={14} />
+                  <EQText style={styles.costText}>{SOLVE_COST}</EQText>
+                </View>
+              </LinearGradient>
+            </Pressable>
+          </View>
         </View>
       </View>
-    </View>
+      <AdBanner />
+    </>
   );
 };
 

@@ -41,7 +41,9 @@ export const getCurrentLevel = () => {
   return getLevel(currentLevel);
 };
 
-export const getSectionReward = () => {};
+export const getSectionReward = () => {
+  //
+};
 
 export const formatCoinCount = (coinCount: number) => {
   if (coinCount >= 1000000) {
