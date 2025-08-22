@@ -76,7 +76,7 @@ export const GameScreen = () => {
           <GameContainer ref={boardRef} level={route.params?.level} />
           <View style={styles.buttonRow}>
             <Pressable
-              style={styles.resetButton}
+              style={styles.button}
               onPress={handleClear}
               disabled={solving}
               sound={SOUNDS.BUTTON_CLICK}>
@@ -95,7 +95,7 @@ export const GameScreen = () => {
               </LinearGradient>
             </Pressable>
             <Pressable
-              style={styles.undoButton}
+              style={styles.button}
               onPress={handleUndo}
               disabled={solving}
               sound={SOUNDS.BUTTON_CLICK}>
@@ -115,7 +115,7 @@ export const GameScreen = () => {
             </Pressable>
 
             <Pressable
-              style={styles.clueButton}
+              style={styles.button}
               disabled={solving}
               onPress={handleSolve}
               sound={SOUNDS.BUTTON_CLICK}>
@@ -189,44 +189,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 12,
   },
-  timerCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 20,
-    padding: 30,
-    alignItems: 'center',
-    minWidth: width * 0.8,
-  },
-  timerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    gap: 10,
-  },
-  clockIcon: {
-    fontSize: 24,
-    color: colors.white,
-  },
-  timerText: {
-    fontSize: 32,
-    color: colors.white,
-    fontFamily: fonts.bold,
-  },
-  progressContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  progressTrack: {
-    width: '100%',
-    height: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    width: '75%',
-    height: '100%',
-    backgroundColor: colors.white,
-    borderRadius: 4,
+  button: {
+    flex: 1,
   },
   buttonRow: {
     flexDirection: 'row',

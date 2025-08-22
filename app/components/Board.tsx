@@ -60,7 +60,7 @@ const BoardComponent = forwardRef(
 
     const snapRef = useRef<any>();
 
-    const cellSize = useMemo(() => Math.min(width - 20, 375) / size, [size]);
+    const cellSize = useMemo(() => Math.min(width - 20, 400) / size, [size]);
     const gameFinished = useSharedValue(false);
     const {play} = useSound();
 
