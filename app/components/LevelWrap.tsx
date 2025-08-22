@@ -34,7 +34,7 @@ export const LevelWrap = () => {
       <View style={styles.coinWrapper}>
         <LevelSvg width={24} height={24} />
       </View>
-      <EQText style={styles.coinText}>{1321}</EQText>
+      <EQText style={styles.coinText}>{currentLevel}</EQText>
     </Animated.View>
   );
 };
