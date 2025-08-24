@@ -12,7 +12,7 @@ import {useAppNavigation} from '../hooks/useAppNavigation';
 import {useAppSelector} from '../hooks/useAppSelector';
 import {Level} from '../models/game';
 import {SCREENS} from '../navigation/screens';
-import {getLevelData} from '../utils/helpers';
+import {getLevelData, getSectionReward} from '../utils/helpers';
 
 interface LevelSection {
   title: string;
@@ -27,7 +27,7 @@ interface RouteParams {
 export const LevelsScreen = () => {
   const navigation = useAppNavigation();
   const route = useRoute<RouteProp<{params: RouteParams}>>();
-  const {currentLevel} = useAppSelector(state => state.userData);
+  const {currentLevel, gameFinished} = useAppSelector(state => state.userData);
 
   const levelSections: LevelSection[] = useMemo(() => {
     const levelsData = getLevelData(route.params.groupId) as Level[];
@@ -54,7 +54,9 @@ export const LevelsScreen = () => {
 
   const handleLevelPress = useCallback(
     (level: Level) => {
-      navigation.navigate(SCREENS.GAME, {level: level});
+      const coinReward = getSectionReward(level.id);
+      const passedLevel = {...level, coinReward};
+      navigation.navigate(SCREENS.GAME, {level: passedLevel});
     },
     [navigation],
   );
@@ -69,15 +71,7 @@ export const LevelsScreen = () => {
   const renderSectionHeader = useCallback(
     ({section}: {section: LevelSection}) => {
       const startLevel = section.data[0].id;
-      const coinReward =
-        startLevel <= 100
-          ? 500
-          : startLevel <= 400
-          ? 750
-          : startLevel <= 800
-          ? 1000
-          : 1250;
-      // Determine if section is blocked
+      const coinReward = getSectionReward(startLevel);
       const sectionBlocked = isSectionBlocked(section);
       return (
         <View style={styles.sectionHeader}>
@@ -106,9 +100,9 @@ export const LevelsScreen = () => {
           {renderSectionHeader({section: item})}
           <View style={styles.levelsGrid}>
             {item.data.map(level => {
-              const isCurrentLevel = level.id === currentLevel;
+              const isCurrentLevel = level.id === currentLevel && !gameFinished;
               const isBlocked = level.id > currentLevel;
-              const isCompleted = level.id < currentLevel;
+              const isCompleted = level.id < currentLevel || gameFinished;
               return (
                 <LevelBlock
                   key={level.id}
@@ -124,7 +118,7 @@ export const LevelsScreen = () => {
         </View>
       );
     },
-    [renderSectionHeader, currentLevel, handleLevelPress],
+    [renderSectionHeader, currentLevel, handleLevelPress, gameFinished],
   );
 
   return (

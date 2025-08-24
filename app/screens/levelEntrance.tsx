@@ -11,7 +11,7 @@ import {SCREENS} from '../navigation/screens';
 
 export const LevelEntranceScreen = () => {
   const navigation = useAppNavigation();
-  const {currentLevel} = useAppSelector(state => state.userData);
+  const {currentLevel, gameFinished} = useAppSelector(state => state.userData);
 
   const levelGroups: LevelGroup[] = [
     {
@@ -147,12 +147,12 @@ export const LevelEntranceScreen = () => {
   const renderLevelGroup = useCallback(
     ({item}: {item: LevelGroup}) => (
       <LevelEntranceBlock
-        item={item}
+        item={{...item, isCompleted: gameFinished ? true : item.isCompleted}}
         currentLevel={currentLevel}
         handleLevelGroupPress={handleLevelGroupPress}
       />
     ),
-    [currentLevel, handleLevelGroupPress],
+    [currentLevel, gameFinished, handleLevelGroupPress],
   );
 
   return (

@@ -15,15 +15,25 @@ import {useAppSelector} from '../hooks/useAppSelector';
 import {SOUNDS} from '../models/game';
 import {EQText} from './EQText';
 import {Pressable} from './Pressable';
+import {useAppNavigation} from '../hooks/useAppNavigation';
+import {getCurrentLevel} from '../utils/helpers';
+import {SCREENS} from '../navigation/screens';
 
 const INTERVAL_DURATION = 2000;
 const SLIDE_DURATION = 500;
 
-interface StartButtonProps {
-  startGame: () => void;
-}
+export const StartButton = () => {
+  const {gameFinished} = useAppSelector(state => state.userData);
+  const navigation = useAppNavigation();
+  const startGame = () => {
+    if (gameFinished) {
+      navigation.navigate(SCREENS.LEVEL_ENTRANCE);
+    } else {
+      const level = getCurrentLevel();
+      navigation.navigate(SCREENS.GAME, {level});
+    }
+  };
 
-export const StartButton = ({startGame}: StartButtonProps) => {
   const transformX = useSharedValue(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const {pathColor} = useAppSelector(state => state.userData);
@@ -129,7 +139,6 @@ const styles = StyleSheet.create({
   animatedLineSecond: {
     position: 'absolute',
     backgroundColor: 'rgba(255,255,255,0.3)',
-    shadowColor: 'white',
     shadowOpacity: 0.8,
     shadowRadius: 32,
     width: 12,

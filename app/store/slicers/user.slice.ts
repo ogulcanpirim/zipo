@@ -1,30 +1,29 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {
-  CLEAR_COST,
-  SOLVE_COST,
-  START_COIN,
-  UNDO_COST,
-} from '../../constants/game';
+import {MAX_LEVEL, START_COIN} from '../../constants/game';
 import {PATH_THEMES} from '../../constants/themes';
 
 interface UserDataState {
   currentLevel: number;
-  currentPathMoves: string[];
+  currentDraggedCells: string[];
   globalLoading: boolean;
   coin: number;
   pathColor: string;
   selectedTheme: number;
   unlockedThemes: number[];
+  gameFinished: boolean;
+  moves: number[];
 }
 
 const initialState: UserDataState = {
   currentLevel: 1,
-  currentPathMoves: [],
+  currentDraggedCells: [],
   globalLoading: false,
   coin: START_COIN,
   pathColor: '#EC4899',
   selectedTheme: 1,
   unlockedThemes: [1],
+  gameFinished: false,
+  moves: [],
 };
 
 export const userSlicer = createSlice({
@@ -33,9 +32,14 @@ export const userSlicer = createSlice({
   reducers: {
     setCurrentLevel: (state, action) => {
       state.currentLevel = action.payload;
+      state.gameFinished = action.payload === MAX_LEVEL;
     },
     incrementLevel: state => {
-      state.currentLevel += 1;
+      if (state.currentLevel < MAX_LEVEL) {
+        state.currentLevel += 1;
+      } else {
+        state.gameFinished = true;
+      }
     },
     resetLevel: state => {
       state.currentLevel = 1;
@@ -43,14 +47,20 @@ export const userSlicer = createSlice({
     setCoin: (state, action) => {
       state.coin = action.payload;
     },
-    buyClearBoard: state => {
-      state.coin -= CLEAR_COST;
+    incrementCoin: (state, action) => {
+      state.coin += action.payload;
     },
-    buyUndo: state => {
-      state.coin -= UNDO_COST;
+    buyClearBoard: (state, action) => {
+      const cost = action.payload;
+      state.coin -= cost;
     },
-    buySolve: state => {
-      state.coin -= SOLVE_COST;
+    buyUndo: (state, action) => {
+      const cost = action.payload;
+      state.coin -= cost;
+    },
+    buySolve: (state, action) => {
+      const cost = action.payload;
+      state.coin -= cost;
     },
     setGlobalLoading: (state, action) => {
       state.globalLoading = action.payload;
@@ -59,11 +69,17 @@ export const userSlicer = createSlice({
       state.selectedTheme = action.payload;
       state.pathColor = PATH_THEMES[action.payload - 1].color;
     },
-    setCurrentPathMoves: (state, action) => {
-      state.currentPathMoves = action.payload;
+    setDraggedCells: (state, action) => {
+      state.currentDraggedCells = action.payload;
     },
-    clearPathMoves: state => {
-      state.currentPathMoves = [];
+    clearDraggedCells: state => {
+      state.currentDraggedCells = [];
+    },
+    setMoves: (state, action) => {
+      state.moves = action.payload;
+    },
+    clearMoves: state => {
+      state.moves = [];
     },
     buyTheme: (state, action) => {
       const themeId = action.payload;
@@ -76,12 +92,13 @@ export const userSlicer = createSlice({
     },
     clearData: state => {
       state.currentLevel = 1;
-      state.currentPathMoves = [];
+      state.currentDraggedCells = [];
       state.globalLoading = false;
       state.coin = START_COIN;
       state.pathColor = '#EC4899';
       state.selectedTheme = 1;
       state.unlockedThemes = [1];
+      state.gameFinished = false;
     },
   },
 });
@@ -91,14 +108,17 @@ export const {
   incrementLevel,
   resetLevel,
   setCoin,
+  incrementCoin,
   buyClearBoard,
   buyUndo,
   buySolve,
   setGlobalLoading,
   setSelectedTheme,
   buyTheme,
-  setCurrentPathMoves,
-  clearPathMoves,
+  setDraggedCells,
+  clearDraggedCells,
+  setMoves,
+  clearMoves,
   clearData,
 } = userSlicer.actions;
 export default userSlicer.reducer;

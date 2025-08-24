@@ -4,24 +4,23 @@ import {
   ImageBackground,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View,
 } from 'react-native';
-import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import LinearGradient from 'react-native-linear-gradient';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {CoinWrap} from '../components/CoinWrap';
 import {EQText} from '../components/EQText';
 import {HowToPlayModal} from '../components/HowToPlayModal';
+import {LevelWrap} from '../components/LevelWrap';
 import {Pressable} from '../components/Pressable';
 import {StartButton} from '../components/StartButton';
+import TimerWrap from '../components/TimerWrap';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import {useAppNavigation} from '../hooks/useAppNavigation';
 import {useBottomSheet} from '../hooks/useBottomsheet';
 import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
-import {getCurrentLevel} from '../utils/helpers';
-import {LevelWrap} from '../components/LevelWrap';
 
 export const DashboardScreen = () => {
   const navigation = useAppNavigation();
@@ -38,12 +37,6 @@ export const DashboardScreen = () => {
   const handleThemePress = () => {
     navigation.navigate(SCREENS.THEMES);
   };
-
-  const startGame = () => {
-    const level = getCurrentLevel();
-    navigation.navigate(SCREENS.GAME, {level});
-  };
-
   const handleHowToPlay = () => {
     expand({
       content: <HowToPlayModal />,
@@ -57,6 +50,11 @@ export const DashboardScreen = () => {
     navigation.navigate(SCREENS.DEV_MODE);
   };
 
+  const handleSettingsPress = () => {
+    // TODO: Implement settings navigation or modal
+    // navigation.navigate(SCREENS.SETTINGS);
+  };
+
   return (
     <ImageBackground
       style={styles.wrapper}
@@ -64,13 +62,15 @@ export const DashboardScreen = () => {
       resizeMode="cover">
       <View style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.howToPlayButton}
-            activeOpacity={0.7}
-            onPress={handleHowToPlay}>
-            <EQText style={styles.howToPlayText}>How to Play</EQText>
-          </TouchableOpacity>
+          <Pressable
+            onPress={handleSettingsPress}
+            style={styles.settingsButton}
+            hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
+            sound={SOUNDS.BUTTON_CLICK}>
+            <FontAwesome6 name="gear" size={20} color={colors.white} />
+          </Pressable>
           <View style={styles.wrapContainer}>
+            <TimerWrap />
             <LevelWrap />
             <CoinWrap />
           </View>
@@ -86,13 +86,19 @@ export const DashboardScreen = () => {
           </View>
           <View style={styles.introSection}>
             <EQText style={styles.introTitle}>Welcome to Zipo</EQText>
+            <Pressable
+              style={styles.howToPlayButton}
+              sound={SOUNDS.BUTTON_CLICK}
+              onPress={handleHowToPlay}>
+              <EQText style={styles.howToPlayText}>How to Play</EQText>
+            </Pressable>
             <EQText style={styles.introSubtitle}>
               Solve puzzles, unlock levels, and collect coins in this addictive
               puzzle game
             </EQText>
           </View>
           <View style={styles.startGameContainer}>
-            <StartButton startGame={startGame} />
+            <StartButton />
           </View>
           <View style={styles.additionalSectionsContainer}>
             <Pressable
@@ -175,14 +181,6 @@ export const DashboardScreen = () => {
                 </View>
               </LinearGradient>
             </Pressable>
-            {/* <CoinFarmerContainer
-              onCollect={amount => {
-                console.log(`Collected ${amount} coins`);
-              }}
-              onCollectDouble={amount => {
-                console.log(`Collected ${amount} coins (2x)`);
-              }}
-            /> */}
           </View>
         </ScrollView>
       </View>
@@ -206,9 +204,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-
-    paddingVertical: 10,
     marginBottom: 10,
+    paddingBottom: 10,
+  },
+  settingsButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    borderRadius: 8,
+    justifyContent: 'center',
+    backgroundColor: `${colors.white}20`,
   },
   howToPlayButton: {
     paddingVertical: 2,
@@ -216,6 +221,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.white,
+    marginBottom: 12,
   },
   howToPlayText: {
     fontSize: 14,
@@ -225,12 +231,16 @@ const styles = StyleSheet.create({
   wrapContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 32,
+    gap: 34,
   },
   scroll: {
     flex: 1,
     width: '100%',
     paddingTop: 5,
+  },
+  timerContainer: {
+    position: 'absolute',
+    right: 10,
   },
   logoContainer: {
     alignItems: 'center',
@@ -303,16 +313,7 @@ const styles = StyleSheet.create({
   sectionCard: {
     width: '100%',
     borderRadius: 12,
-    overflow: 'hidden',
     marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
   sectionGradient: {
     padding: 20,

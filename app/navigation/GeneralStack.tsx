@@ -1,17 +1,14 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {AchievementsScreen} from '../screens/achievements';
 import {DashboardScreen} from '../screens/dashboard';
+import {DevModeScreen} from '../screens/devMode';
 import {GameScreen} from '../screens/game';
 import {GameFinishScreen} from '../screens/gameFinish';
-import {LeaderboardScreen} from '../screens/leaderboard';
 import {LevelEntranceScreen} from '../screens/levelEntrance';
 import {LevelsScreen} from '../screens/levels';
 import {MarketplaceScreen} from '../screens/marketplace';
-import {ProfileScreen} from '../screens/profile';
 import {ThemesScreen} from '../screens/themes';
 import {SCREENS} from './screens';
-import {DevModeScreen} from '../screens/devMode';
 
 const Stack = createNativeStackNavigator();
 
@@ -22,12 +19,6 @@ export const GeneralStack = () => {
         headerShown: false,
       }}>
       <Stack.Screen name={SCREENS.DASHBOARD} component={DashboardScreen} />
-      <Stack.Screen name={SCREENS.PROFILE} component={ProfileScreen} />
-      <Stack.Screen name={SCREENS.LEADERBOARD} component={LeaderboardScreen} />
-      <Stack.Screen
-        name={SCREENS.ACHIEVEMENTS}
-        component={AchievementsScreen}
-      />
       <Stack.Screen name={SCREENS.GAME} component={GameScreen} />
       <Stack.Screen name={SCREENS.MARKETPLACE} component={MarketplaceScreen} />
       <Stack.Screen name={SCREENS.LEVELS} component={LevelsScreen} />

@@ -17,7 +17,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import ViewShot from 'react-native-view-shot';
 import {Grid} from '../components/Grid';
 import {Path, PathHandle} from '../components/Path';
 import {
@@ -28,10 +27,15 @@ import {
 } from '../constants/animations';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
-import {useAppNavigation} from '../hooks/useAppNavigation';
 import {useSound} from '../hooks/useSound';
 import {SOUNDS} from '../models/game';
-import {SCREENS} from '../navigation/screens';
+import redux, {useAppDispatch} from '../store';
+import {
+  clearDraggedCells,
+  clearMoves,
+  setDraggedCells,
+  setMoves,
+} from '../store/slicers/user.slice';
 
 const {width} = Dimensions.get('window');
 
@@ -40,12 +44,16 @@ export interface BoardProps {
   numbers: Array<[number, number, number]>;
   walls: Array<[number, number, number]>;
   solvePath: Array<[number, number]>;
-  rewardCoin: number;
+  captureBoard: () => void;
+  level_id?: number;
 }
 
 const BoardComponent = forwardRef(
-  ({size, numbers, walls, solvePath, rewardCoin}: BoardProps, ref) => {
-    const navigation = useAppNavigation();
+  (
+    {size, numbers, walls, solvePath, captureBoard, level_id}: BoardProps,
+    ref,
+  ) => {
+    const dispatch = useAppDispatch();
     const pathRef = useRef<PathHandle>(null);
 
     const isDragging = useSharedValue(false);
@@ -58,8 +66,6 @@ const BoardComponent = forwardRef(
     const moveInGesture = useSharedValue(0);
     const solving = useSharedValue(false);
 
-    const snapRef = useRef<any>();
-
     const cellSize = useMemo(() => Math.min(width - 20, 400) / size, [size]);
     const gameFinished = useSharedValue(false);
     const {play} = useSound();
@@ -68,6 +74,25 @@ const BoardComponent = forwardRef(
       if (pathRef.current?.clearPath) {
         runOnJS(pathRef.current.clearPath)();
       }
+    };
+
+    useEffect(() => {
+      const {
+        currentLevel,
+        currentDraggedCells,
+        moves: currentMoves,
+      } = redux.store.getState().userData;
+      if (currentLevel === level_id && currentDraggedCells.length > 0) {
+        draggedCells.value = currentDraggedCells;
+        moves.value = currentMoves;
+        isDragging.value = true;
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const updatePathInRedux = () => {
+      dispatch(setDraggedCells(draggedCells.value));
+      dispatch(setMoves(moves.value));
     };
 
     const clearBoard = () => {
@@ -81,6 +106,8 @@ const BoardComponent = forwardRef(
       gameFinished.value = false;
       moves.value = [];
       moveInGesture.value = 0;
+      dispatch(clearDraggedCells());
+      dispatch(clearMoves());
       return true;
     };
 
@@ -305,20 +332,9 @@ const BoardComponent = forwardRef(
       );
     };
 
-    const captureBoard = () => {
-      setTimeout(() => {
-        snapRef?.current?.capture?.().then((uri: string) => {
-          solving.value = false;
-          navigation.navigate(SCREENS.GAME_FINISH, {
-            imageUri: uri,
-            rewardCoin: rewardCoin,
-          });
-        });
-      }, 100);
-    };
-
     const directToWin = () => {
       gameFinished.value = true;
+      solving.value = false;
       runOnJS(captureBoard)();
     };
 
@@ -350,6 +366,8 @@ const BoardComponent = forwardRef(
       } else if (isBoardFilled()) {
         runOnJS(clearBoard)();
         runOnJS(shakeBoard)();
+      } else {
+        runOnJS(updatePathInRedux)();
       }
     };
 
@@ -431,6 +449,7 @@ const BoardComponent = forwardRef(
             ...draggedCells.value,
             `${cell.row}-${cell.col}`,
           ];
+          isDragging.value = true;
           moveInGesture.value += 1;
         }
       })
@@ -505,26 +524,24 @@ const BoardComponent = forwardRef(
     });
 
     return (
-      <ViewShot ref={snapRef} options={{format: 'png', quality: 0.8}}>
-        <GestureDetector gesture={simultaneousGesture}>
-          <Animated.View
-            style={[
-              styles.board,
-              {width: size * cellSize, height: size * cellSize},
-              boardAnimatedStyle,
-            ]}>
-            <Grid
-              size={size}
-              numbers={numbers}
-              walls={walls}
-              cellSize={cellSize}
-              draggedCells={draggedCells}
-              cellWalls={walls}
-            />
-            <Path ref={pathRef} size={size} cellSize={cellSize} />
-          </Animated.View>
-        </GestureDetector>
-      </ViewShot>
+      <GestureDetector gesture={simultaneousGesture}>
+        <Animated.View
+          style={[
+            styles.board,
+            {width: size * cellSize, height: size * cellSize},
+            boardAnimatedStyle,
+          ]}>
+          <Grid
+            size={size}
+            numbers={numbers}
+            walls={walls}
+            cellSize={cellSize}
+            draggedCells={draggedCells}
+            cellWalls={walls}
+          />
+          <Path ref={pathRef} size={size} cellSize={cellSize} />
+        </Animated.View>
+      </GestureDetector>
     );
   },
 );

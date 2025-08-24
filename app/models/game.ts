@@ -5,6 +5,7 @@ export interface Level {
   numbers: Array<[number, number, number]>;
   walls: Array<[number, number, number]>;
   solutionPath: Array<[number, number]>;
+  coinReward: number;
 }
 
 export enum ELevelDifficulty {
@@ -53,4 +54,10 @@ export interface PathTheme {
 export interface LevelSection {
   title: string;
   data: Level[];
+}
+
+export interface BoardRef {
+  solve: () => Promise<boolean>;
+  undo: () => boolean;
+  clearBoard: () => boolean;
 }

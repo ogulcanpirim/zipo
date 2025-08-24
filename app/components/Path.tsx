@@ -1,9 +1,9 @@
 import React, {
   forwardRef,
-  useImperativeHandle,
-  useState,
   memo,
   useCallback,
+  useImperativeHandle,
+  useState,
 } from 'react';
 import {StyleProp, ViewStyle} from 'react-native';
 import Svg, {
@@ -14,9 +14,12 @@ import Svg, {
 } from 'react-native-svg';
 import {colors} from '../constants/colors';
 import {useAppSelector} from '../hooks/useAppSelector';
+import {useAppDispatch} from '../store';
+import {setDraggedCells} from '../store/slicers/user.slice';
 
 export interface PathHandle {
   updatePathData: (path: string) => void;
+  updateReduxPath: () => void;
   undo: (moveCount: number) => void;
   clearPath: () => void;
 }
@@ -28,11 +31,9 @@ interface PathProps {
 
 const PathComponent = forwardRef<PathHandle, PathProps>(
   ({size, cellSize}, ref) => {
+    const dispatch = useAppDispatch();
     const pathColor = useAppSelector(state => state.userData.pathColor);
-    const currentPathMoves = useAppSelector(
-      state => state.userData.currentPathMoves,
-    );
-    const [moves, setMoves] = useState<string[]>(currentPathMoves ?? []);
+    const [moves, setMoves] = useState<string[]>([]);
     const pathDataState = moves.length > 0 ? moves[moves.length - 1] : '';
 
     const updatePathData = (path: string) => {
@@ -43,14 +44,19 @@ const PathComponent = forwardRef<PathHandle, PathProps>(
       setMoves(prevMoves => prevMoves.slice(0, -moveCount));
     }, []);
 
+    const updateReduxPath = useCallback(() => {
+      dispatch(setDraggedCells(moves));
+    }, [dispatch, moves]);
+
     useImperativeHandle(
       ref,
       () => ({
         updatePathData,
+        updateReduxPath,
         undo,
         clearPath: () => setMoves([]),
       }),
-      [undo],
+      [undo, updateReduxPath],
     );
 
     if (!pathDataState || pathDataState === '') {

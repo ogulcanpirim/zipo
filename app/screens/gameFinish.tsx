@@ -1,5 +1,5 @@
-import {RouteProp, useRoute} from '@react-navigation/native';
-import React from 'react';
+import {RouteProp, StackActions, useRoute} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, {FadeIn} from 'react-native-reanimated';
@@ -18,30 +18,98 @@ import {useSound} from '../hooks/useSound';
 import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 import {useAppDispatch} from '../store';
-import {incrementLevel} from '../store/slicers/user.slice';
+import {incrementCoin, incrementLevel} from '../store/slicers/user.slice';
 import {formatCoinCount, getCurrentLevel} from '../utils/helpers';
+import {
+  RewardedAd,
+  RewardedAdEventType,
+  TestIds,
+} from 'react-native-google-mobile-ads';
+import {MAX_LEVEL} from '../constants/game';
+import ConfettiCannon from 'react-native-confetti-cannon';
+import {useModal} from '../hooks/useModal';
+import {GameFinishModal} from '../components/GameFinishModal';
+
+const adUnitId = __DEV__
+  ? TestIds.REWARDED
+  : 'ca-app-pub-5097211111237502/3093415584';
+
+const rewarded = RewardedAd.createForAdRequest(adUnitId);
 
 export const GameFinishScreen = () => {
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const navigation = useAppNavigation();
-  const route =
-    useRoute<RouteProp<{params: {imageUri: string; rewardCoin: number}}>>();
+  const route = useRoute<
+    RouteProp<{
+      params: {imageUri: string; rewardCoin: number; level_id?: number};
+    }>
+  >();
   const pathColor = useAppSelector(state => state.userData.pathColor);
   const {play} = useSound();
+  const [loaded, setLoaded] = useState(false);
+  const [rewardEarned, setRewardEarned] = useState(false);
+  const earnedCoin = route.params?.rewardCoin ?? 0;
 
-  const currentLevel = useAppSelector(state => state.userData.currentLevel);
+  const {currentLevel, gameFinished} = useAppSelector(state => state.userData);
+  const maxLevelReached = currentLevel >= MAX_LEVEL;
+  const levelAlreadyCompleted = route.params?.level_id
+    ? currentLevel > route.params.level_id || gameFinished
+    : false;
+
+  const {expand} = useModal();
+
+  useEffect(() => {
+    if (currentLevel === MAX_LEVEL && !gameFinished) {
+      expand({content: <GameFinishModal />});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onPressDoubleCoin = () => {
+    if (!loaded) {
+      return;
+    }
+    rewarded.show();
+  };
+
+  useEffect(() => {
+    const unsubscribeLoaded = rewarded.addAdEventListener(
+      RewardedAdEventType.LOADED,
+      () => {
+        setLoaded(true);
+      },
+    );
+    const unsubscribeEarned = rewarded.addAdEventListener(
+      RewardedAdEventType.EARNED_REWARD,
+      () => {
+        setRewardEarned(true);
+        dispatch(incrementCoin(earnedCoin * 2));
+      },
+    );
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeEarned();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onPressIn = () => {
     play(SOUNDS.BUTTON_CLICK);
   };
 
   const handleClose = () => {
+    if (levelAlreadyCompleted) {
+      navigation.dispatch(StackActions.pop(2));
+      return;
+    }
     dispatch(incrementLevel());
+    dispatch(incrementCoin(route.params?.rewardCoin ?? 0));
     navigation.goBack();
   };
 
   const handleNextLevel = () => {
+    dispatch(incrementCoin(route.params?.rewardCoin ?? 0));
     dispatch(incrementLevel());
     const level = getCurrentLevel();
     navigation.navigate(SCREENS.GAME, {level});
@@ -49,6 +117,7 @@ export const GameFinishScreen = () => {
 
   return (
     <View style={[styles.safeArea, {paddingTop: insets.top}]}>
+      <ConfettiCannon count={200} origin={{x: -10, y: 0}} />
       <View style={styles.header}>
         <CoinWrap />
         <TouchableOpacity
@@ -64,49 +133,78 @@ export const GameFinishScreen = () => {
           style={styles.animatedTextContainer}>
           <EQText style={styles.title}>Congratulations!</EQText>
           <EQText style={[styles.levelUnlockedText, {color: pathColor}]}>
-            {`Level ${currentLevel + 1} Unlocked`}
+            {levelAlreadyCompleted || maxLevelReached
+              ? `Level ${route.params?.level_id}`
+              : `Level ${currentLevel + 1} Unlocked`}
           </EQText>
-          <View style={styles.earnedCoinContainer}>
-            <EQText style={styles.collectPlus}>+</EQText>
-            <CoinSvg width={14} height={14} />
-            <EQText style={styles.collectText}>
-              {formatCoinCount(route.params?.rewardCoin)}
-            </EQText>
-          </View>
+          {!levelAlreadyCompleted && (
+            <View style={styles.earnedCoinContainer}>
+              <EQText style={styles.collectPlus}>+</EQText>
+              <CoinSvg width={14} height={14} />
+              <EQText style={styles.collectText}>
+                {formatCoinCount(route.params?.rewardCoin)}
+              </EQText>
+            </View>
+          )}
         </Animated.View>
         <Animated.View
           style={styles.imageContainer}
           entering={FadeIn.delay(400)}>
-          <Image source={{uri: route.params?.imageUri}} style={styles.image} />
+          <Image
+            source={{uri: route.params?.imageUri}}
+            resizeMethod="scale"
+            style={styles.image}
+          />
         </Animated.View>
         <Animated.View style={styles.buttons} entering={FadeIn.delay(500)}>
-          <Pressable
-            sound={SOUNDS.BUTTON_CLICK}
-            onPress={handleNextLevel}
-            style={styles.addPressable}>
-            <LinearGradient
-              colors={['#FF6B35', '#E55A2B']}
-              style={styles.adButton}>
-              <EQText style={styles.costText}>Collect</EQText>
-              <CoinSvg width={14} height={14} />
-              <EQText style={styles.costText}>
-                {formatCoinCount(route.params?.rewardCoin * 2)}
-              </EQText>
-            </LinearGradient>
-            <View style={styles.watchAdContainer}>
-              <MaterialIcons
-                name="video-collection"
-                size={22}
-                color={colors.white}
-              />
-            </View>
-          </Pressable>
-          <Pressable
-            style={styles.buttonContainer}
-            sound={SOUNDS.BUTTON_CLICK}
-            onPress={handleNextLevel}>
-            <EQText style={styles.buttonText}>Next Level</EQText>
-          </Pressable>
+          {levelAlreadyCompleted ? (
+            <Pressable
+              sound={SOUNDS.BUTTON_CLICK}
+              onPress={handleClose}
+              style={styles.buttonContainer}>
+              <EQText style={styles.buttonText}>Close</EQText>
+            </Pressable>
+          ) : (
+            !gameFinished && (
+              <Pressable
+                sound={SOUNDS.BUTTON_CLICK}
+                onPress={onPressDoubleCoin}
+                style={[styles.addPressable, rewardEarned && styles.disabled]}>
+                <LinearGradient
+                  colors={['#FF6B35', '#8E3201']}
+                  start={{x: 0, y: 0}}
+                  end={{x: 0, y: 1}}
+                  style={styles.adButton}>
+                  <EQText style={styles.costText}>
+                    {rewardEarned ? 'Earned' : 'Collect'}
+                  </EQText>
+                  <CoinSvg width={14} height={14} />
+                  <EQText style={styles.costText}>
+                    {formatCoinCount(earnedCoin * 2)}
+                  </EQText>
+                </LinearGradient>
+                <View style={styles.watchAdContainer}>
+                  <MaterialIcons
+                    name="video-collection"
+                    size={22}
+                    color={colors.white}
+                  />
+                </View>
+              </Pressable>
+            )
+          )}
+          {!levelAlreadyCompleted && (
+            <Pressable
+              style={[
+                styles.buttonContainer,
+                maxLevelReached && styles.disabled,
+              ]}
+              sound={SOUNDS.BUTTON_CLICK}
+              disabled={maxLevelReached}
+              onPress={handleNextLevel}>
+              <EQText style={styles.buttonText}>Next Level</EQText>
+            </Pressable>
+          )}
         </Animated.View>
       </View>
     </View>
@@ -194,6 +292,9 @@ const styles = StyleSheet.create({
   addPressable: {
     flex: 1,
     borderRadius: 12,
+  },
+  disabled: {
+    opacity: 0.5,
   },
   adButton: {
     flexDirection: 'row',

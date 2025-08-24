@@ -13,7 +13,11 @@ import CoinSvg from './CoinSvg';
 import {EQText} from './EQText';
 import {formatCoinCount} from '../utils/helpers';
 
-export const CoinWrap = () => {
+interface CoinWrapProps {
+  text?: string;
+}
+
+export const CoinWrap = ({text}: CoinWrapProps) => {
   const coinCount = useAppSelector(state => state.userData.coin);
 
   const formattedCoinCount = useMemo(
@@ -40,7 +44,7 @@ export const CoinWrap = () => {
       <View style={styles.coinWrapper}>
         <CoinSvg width={24} height={24} />
       </View>
-      <EQText style={styles.coinText}>{formattedCoinCount}</EQText>
+      <EQText style={styles.coinText}>{text ?? formattedCoinCount}</EQText>
     </Animated.View>
   );
 };
