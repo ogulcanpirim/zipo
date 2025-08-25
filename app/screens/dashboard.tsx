@@ -22,6 +22,7 @@ import {useBottomSheet} from '../hooks/useBottomsheet';
 import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 import {DEV_MODE_ENABLED} from '../constants/game';
+import {SettingsSheet} from '../components/SettingsSheet';
 
 export const DashboardScreen = () => {
   const navigation = useAppNavigation();
@@ -38,6 +39,16 @@ export const DashboardScreen = () => {
   const handleThemePress = () => {
     navigation.navigate(SCREENS.THEMES);
   };
+
+  const handleSettingsPress = () => {
+    expand({
+      content: <SettingsSheet />,
+      snapPoints: [450],
+      enablePanDownToClose: true,
+      pressBehavior: 'close',
+    });
+  };
+
   const handleHowToPlay = () => {
     expand({
       content: <HowToPlayModal />,
@@ -49,11 +60,6 @@ export const DashboardScreen = () => {
 
   const handleDevMode = () => {
     navigation.navigate(SCREENS.DEV_MODE);
-  };
-
-  const handleSettingsPress = () => {
-    // TODO: Implement settings navigation or modal
-    // navigation.navigate(SCREENS.SETTINGS);
   };
 
   return (

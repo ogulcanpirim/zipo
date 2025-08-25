@@ -13,6 +13,10 @@ interface UserDataState {
   gameFinished: boolean;
   moves: number[];
   isPro: boolean;
+  settings: {
+    soundEnabled: boolean;
+    vibrateEnabled: boolean;
+  };
 }
 
 const initialState: UserDataState = {
@@ -26,6 +30,10 @@ const initialState: UserDataState = {
   gameFinished: false,
   moves: [],
   isPro: false,
+  settings: {
+    soundEnabled: true,
+    vibrateEnabled: true,
+  },
 };
 
 export const userSlicer = createSlice({
@@ -105,6 +113,12 @@ export const userSlicer = createSlice({
     setPro: (state, action) => {
       state.isPro = action.payload;
     },
+    setSound: (state, action) => {
+      state.settings.soundEnabled = action.payload;
+    },
+    setVibrate: (state, action) => {
+      state.settings.vibrateEnabled = action.payload;
+    },
   },
 });
 
@@ -126,5 +140,7 @@ export const {
   clearMoves,
   clearData,
   setPro,
+  setSound,
+  setVibrate,
 } = userSlicer.actions;
 export default userSlicer.reducer;

@@ -7,6 +7,7 @@ import {
 } from '../contexts/ModalContext';
 import {useSound} from '../hooks/useSound';
 import {SOUNDS} from '../models/game';
+import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 
 interface ModalProviderProps {
   children: React.ReactNode;
@@ -36,12 +37,15 @@ export const ModalProvider = ({children}: ModalProviderProps) => {
       <>
         {children}
         {content ? (
-          <View style={styles.overlay}>
+          <Animated.View
+            style={styles.overlay}
+            entering={FadeIn}
+            exiting={FadeOut}>
             <TouchableWithoutFeedback onPress={handleClose}>
               <View style={StyleSheet.absoluteFill} />
             </TouchableWithoutFeedback>
             <View style={styles.content}>{content}</View>
-          </View>
+          </Animated.View>
         ) : null}
       </>
     </ModalContext.Provider>

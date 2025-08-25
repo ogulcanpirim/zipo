@@ -7,6 +7,9 @@ import AnimatedBootsplashContainer from './app/containers/AnimatedBootsplash';
 import AppNavigationContainer from './app/navigation/AppNavigation';
 import LoaderProvider from './app/providers/LoaderProvider';
 import redux from './app/store';
+import {configureReanimatedLogger} from 'react-native-reanimated';
+
+configureReanimatedLogger({strict: false});
 
 const App = () => {
   const [visible, setVisible] = useState(true);

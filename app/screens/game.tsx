@@ -1,7 +1,6 @@
 import {RouteProp, useRoute} from '@react-navigation/native';
 import React, {useRef} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {AdBanner} from '../components/AdBanner';
 import {GameHeader} from '../components/GameHeader';
 import {GameTimer} from '../components/GameTimer';
 import {colors} from '../constants/colors';
@@ -20,21 +19,18 @@ export const GameScreen = () => {
   const boardRef = useRef<BoardRef>(null);
 
   return (
-    <>
-      <View style={styles.container}>
-        <GameHeader level={route?.params?.level?.id} />
-        <View style={styles.gameContainer}>
-          {route.params?.endless && <GameTimer />}
-          <GameContainer ref={boardRef} level={route.params?.level} />
-          <ActionButtonsContainer
-            level={route.params?.level?.id}
-            coinReward={route.params?.level?.coinReward ?? 100}
-            boardRef={boardRef}
-          />
-        </View>
+    <View style={styles.container}>
+      <GameHeader level={route?.params?.level?.id} />
+      <View style={styles.gameContainer}>
+        {route.params?.endless && <GameTimer />}
+        <GameContainer ref={boardRef} level={route.params?.level} />
+        <ActionButtonsContainer
+          level={route.params?.level?.id}
+          coinReward={route.params?.level?.coinReward ?? 100}
+          boardRef={boardRef}
+        />
       </View>
-      <AdBanner />
-    </>
+    </View>
   );
 };
 

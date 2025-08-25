@@ -131,9 +131,6 @@ const styles = StyleSheet.create({
   animatedLine: {
     position: 'absolute',
     backgroundColor: 'rgba(255,255,255,0.3)',
-    shadowColor: 'white',
-    shadowOpacity: 0.8,
-    shadowRadius: 16,
     width: 12,
     height: 100,
     left: -50,
@@ -141,8 +138,6 @@ const styles = StyleSheet.create({
   animatedLineSecond: {
     position: 'absolute',
     backgroundColor: 'rgba(255,255,255,0.3)',
-    shadowOpacity: 0.8,
-    shadowRadius: 32,
     width: 12,
     height: 100,
     left: -35,

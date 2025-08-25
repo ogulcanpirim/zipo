@@ -5,11 +5,16 @@ import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import Svg, {Path} from 'react-native-svg';
 import {useAppSelector} from '../hooks/useAppSelector';
+import {Pressable} from './Pressable';
+import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
+import {SOUNDS} from '../models/game';
+import {useBottomSheet} from '../hooks/useBottomsheet';
 
 const GRID_SIZE = 3;
 const GRID_ITEMS = Array.from({length: GRID_SIZE * GRID_SIZE}, (_, i) => i);
 
 export const HowToPlayModal = () => {
+  const {close} = useBottomSheet();
   const pathColor = useAppSelector(state => state.userData.pathColor);
 
   const getGridCellStyle = (index: number): ViewStyle => {
@@ -23,6 +28,12 @@ export const HowToPlayModal = () => {
 
   return (
     <View style={styles.modalContainer}>
+      <Pressable
+        style={styles.closeContainer}
+        sound={SOUNDS.BUTTON_CLICK}
+        onPress={close}>
+        <FontAwesome6Icon name="xmark" size={24} color={colors.white} />
+      </Pressable>
       <EQText style={styles.modalTitle}>How to Play ?</EQText>
       <View style={styles.items}>
         <View style={styles.leftContainer}>
@@ -78,11 +89,17 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
   },
+  closeContainer: {
+    position: 'absolute',
+    right: 30,
+    top: 0,
+  },
   modalTitle: {
     fontSize: 18,
     color: colors.white,
     textAlign: 'center',
-    marginVertical: 20,
+    marginTop: 10,
+    marginBottom: 20,
     fontFamily: fonts.bold,
   },
   items: {

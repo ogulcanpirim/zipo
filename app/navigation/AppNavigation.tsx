@@ -10,6 +10,8 @@ import BootSplash from 'react-native-bootsplash';
 import {GeneralStack} from './GeneralStack';
 import {BottomSheetProvider} from '../providers/BottomsheetProvider';
 import {ModalProvider} from '../providers/ModalProvider';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+
 export const navigationRef = createNavigationContainerRef<ParamListBase>();
 
 const AppNavigationContainer = () => {
@@ -18,12 +20,14 @@ const AppNavigationContainer = () => {
   };
   return (
     <NavigationContainer ref={navigationRef} onReady={onNavigationReady}>
-      <BottomSheetProvider>
-        <ModalProvider>
-          <SystemBars style="light" />
-          <GeneralStack />
-        </ModalProvider>
-      </BottomSheetProvider>
+      <SafeAreaProvider>
+        <BottomSheetProvider>
+          <ModalProvider>
+            <SystemBars style="light" />
+            <GeneralStack />
+          </ModalProvider>
+        </BottomSheetProvider>
+      </SafeAreaProvider>
     </NavigationContainer>
   );
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  GestureResponderEvent,
   StyleProp,
   TouchableOpacity,
   TouchableOpacityProps,
@@ -35,10 +36,7 @@ export const Pressable = ({
     transform: [{scale: scale.value}],
   }));
 
-  const handlePressIn = (event: any) => {
-    if (sound) {
-      play(sound);
-    }
+  const handlePressIn = (event: GestureResponderEvent) => {
     if (!disableAnimation) {
       scale.value = withSpring(0.95, {
         damping: 7,
@@ -50,7 +48,7 @@ export const Pressable = ({
     }
   };
 
-  const handlePressOut = (event: any) => {
+  const handlePressOut = (event: GestureResponderEvent) => {
     if (!disableAnimation) {
       scale.value = withSpring(1, {
         damping: 7,
@@ -62,12 +60,22 @@ export const Pressable = ({
     }
   };
 
+  const handlePress = (event: GestureResponderEvent) => {
+    if (sound) {
+      play(sound);
+    }
+    if (props.onPress) {
+      props.onPress(event);
+    }
+  };
+
   return (
     <AnimatedTouchableOpacity
       activeOpacity={0.7}
       {...props}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
+      onPress={handlePress}
       hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
       style={[animatedStyle, style]}>
       {props.children}

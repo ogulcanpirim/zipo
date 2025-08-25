@@ -5,7 +5,7 @@ import {Header} from '../components/Header';
 import {useAppSelector} from '../hooks/useAppSelector';
 import {EQText} from '../components/EQText';
 import {fonts} from '../constants/fonts';
-import {useAppDispatch} from '../store';
+import redux, {storage, useAppDispatch} from '../store';
 import {clearData, setCoin, setCurrentLevel} from '../store/slicers/user.slice';
 import {Pressable} from '../components/Pressable';
 import {SOUNDS} from '../models/game';
@@ -23,8 +23,11 @@ export const DevModeScreen = () => {
     setNewCoin(currentCoin.toString());
   }, [currentLevel, currentCoin]);
 
-  const handleReset = () => {
+  const handleReset = async () => {
     dispatch(clearData());
+    await redux.persistor.flush();
+    await redux.persistor.purge();
+    storage.delete('persist:root');
   };
 
   const handleSave = () => {

@@ -51,16 +51,17 @@ export const AdBanner = () => {
 export const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.black,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
   },
   closeButtonContainer: {
+    position: 'absolute',
+    alignSelf: 'flex-end',
+    right: 20,
+    top: -28,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
     paddingHorizontal: 6,
     paddingVertical: 2,
-    marginRight: 24,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },

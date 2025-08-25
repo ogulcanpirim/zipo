@@ -8,7 +8,6 @@ import React, {
 } from 'react';
 import {Dimensions, StyleSheet} from 'react-native';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import Animated, {
   runOnJS,
   useAnimatedReaction,
@@ -27,6 +26,7 @@ import {
 } from '../constants/animations';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
+import {useFeedback} from '../hooks/useFeedback';
 import {useSound} from '../hooks/useSound';
 import {SOUNDS} from '../models/game';
 import redux, {useAppDispatch} from '../store';
@@ -69,6 +69,7 @@ const BoardComponent = forwardRef(
     const cellSize = useMemo(() => Math.min(width - 20, 400) / size, [size]);
     const gameFinished = useSharedValue(false);
     const {play} = useSound();
+    const {vibrate} = useFeedback();
 
     const handleClearPath = () => {
       if (pathRef.current?.clearPath) {
@@ -201,7 +202,7 @@ const BoardComponent = forwardRef(
     };
 
     const updatePathData = (path: string) => {
-      ReactNativeHapticFeedback.trigger('impactLight');
+      vibrate();
       pathRef.current?.updatePathData?.(path);
     };
 
