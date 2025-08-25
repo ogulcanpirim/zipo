@@ -35,3 +35,5 @@ export const COIN_PACKS = [
 
 export const LAST_COLLECTED_TIME = 'last_collected_time';
 export const MAX_WAIT_TIME = 8; // hours
+
+export const DEV_MODE_ENABLED = false;

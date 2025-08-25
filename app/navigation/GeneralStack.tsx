@@ -9,6 +9,7 @@ import {LevelsScreen} from '../screens/levels';
 import {MarketplaceScreen} from '../screens/marketplace';
 import {ThemesScreen} from '../screens/themes';
 import {SCREENS} from './screens';
+import {DEV_MODE_ENABLED} from '../constants/game';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,7 +35,9 @@ export const GeneralStack = () => {
         }}
       />
       <Stack.Screen name={SCREENS.THEMES} component={ThemesScreen} />
-      <Stack.Screen name={SCREENS.DEV_MODE} component={DevModeScreen} />
+      {DEV_MODE_ENABLED && (
+        <Stack.Screen name={SCREENS.DEV_MODE} component={DevModeScreen} />
+      )}
     </Stack.Navigator>
   );
 };
