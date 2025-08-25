@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, {
@@ -6,23 +6,26 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
+import {useAppNavigation} from '../hooks/useAppNavigation';
 import {useAppSelector} from '../hooks/useAppSelector';
 import {SOUNDS} from '../models/game';
+import {SCREENS} from '../navigation/screens';
+import {getCurrentLevel} from '../utils/helpers';
 import {EQText} from './EQText';
 import {Pressable} from './Pressable';
-import {useAppNavigation} from '../hooks/useAppNavigation';
-import {getCurrentLevel} from '../utils/helpers';
-import {SCREENS} from '../navigation/screens';
 
 const INTERVAL_DURATION = 2000;
 const SLIDE_DURATION = 500;
 
-export const StartButton = () => {
+const StartButtonComponent = () => {
   const {gameFinished} = useAppSelector(state => state.userData);
   const navigation = useAppNavigation();
   const startGame = () => {
@@ -35,7 +38,6 @@ export const StartButton = () => {
   };
 
   const transformX = useSharedValue(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const {pathColor} = useAppSelector(state => state.userData);
 
   const scaleValue = useDerivedValue(() => {
@@ -46,18 +48,16 @@ export const StartButton = () => {
     return interpolate(transformX.value, [0, 200, 400], [0.2, 0.6, 0.2]);
   });
 
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      runAnimation();
-    }, INTERVAL_DURATION);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const runAnimation = () => {
-    transformX.value = withTiming(400, {duration: SLIDE_DURATION}, () => {
-      transformX.value = 0;
-    });
-  };
+  transformX.value = withRepeat(
+    withDelay(
+      INTERVAL_DURATION,
+      withSequence(
+        withTiming(400, {duration: SLIDE_DURATION}),
+        withTiming(0, {duration: 10}),
+      ),
+    ),
+    -1,
+  );
 
   const animatedLineStyle = useAnimatedStyle(() => {
     return {
@@ -99,6 +99,8 @@ export const StartButton = () => {
     </Animated.View>
   );
 };
+
+export const StartButton = React.memo(StartButtonComponent);
 
 const styles = StyleSheet.create({
   startGameButton: {
