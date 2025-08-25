@@ -12,6 +12,7 @@ interface UserDataState {
   unlockedThemes: number[];
   gameFinished: boolean;
   moves: number[];
+  isPro: boolean;
 }
 
 const initialState: UserDataState = {
@@ -24,6 +25,7 @@ const initialState: UserDataState = {
   unlockedThemes: [1],
   gameFinished: false,
   moves: [],
+  isPro: false,
 };
 
 export const userSlicer = createSlice({
@@ -100,6 +102,9 @@ export const userSlicer = createSlice({
       state.unlockedThemes = [1];
       state.gameFinished = false;
     },
+    setPro: (state, action) => {
+      state.isPro = action.payload;
+    },
   },
 });
 
@@ -120,5 +125,6 @@ export const {
   setMoves,
   clearMoves,
   clearData,
+  setPro,
 } = userSlicer.actions;
 export default userSlicer.reducer;

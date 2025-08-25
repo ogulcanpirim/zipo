@@ -1,4 +1,4 @@
-import {MAX_LEVEL} from '../constants/game';
+import {COIN_PACKS, MAX_LEVEL} from '../constants/game';
 import redux from '../store';
 
 export const getLevelData = (id: number) => {
@@ -74,4 +74,18 @@ export const formatCoinCount = (coinCount: number) => {
     return `${(coinCount / 1000).toFixed(2)}K`;
   }
   return coinCount?.toString();
+};
+
+export const getCollectorRewardPerHour = (level: number) => {
+  const reward = getSectionReward(level);
+  return Math.round(reward * 0.15);
+};
+
+export const getCoinPacks = (level: number) => {
+  const idlePerDay = getCollectorRewardPerHour(level) * 24;
+  return COIN_PACKS.map(pack => ({
+    ...pack,
+    coins: Math.round(idlePerDay * pack.day),
+    bonus: Math.round(idlePerDay * pack.day * 0.1), // 10% bonus
+  }));
 };

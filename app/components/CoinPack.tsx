@@ -7,6 +7,7 @@ import CoinSvg from './CoinSvg';
 import {EQText} from './EQText';
 import {Pressable} from './Pressable';
 import LinearGradient from 'react-native-linear-gradient';
+import { formatCoinCount } from '../utils/helpers';
 
 interface CoinPackProps {
   id: number;
@@ -39,33 +40,32 @@ export const CoinPack = ({
   bonusAmount,
   price,
 }: CoinPackProps) => {
-  // Pick a dark and light color for each pack for the gradient, but darken the bottom color a bit
   const getGradientColors = (containerId: number): string[] => {
     switch (containerId) {
       case 1: {
         const top = '#7a5a00';
-        const bottom = darken('#ffe08a', 0.18); // darken by 18%
-        return [top, bottom];
+        const bottom = darken('#ffe08a', 0.18);
+        return [bottom, top];
       }
       case 2: {
         const top = '#00594e';
         const bottom = darken('#6fffe2', 0.18);
-        return [top, bottom];
+        return [bottom, top];
       }
       case 3: {
         const top = '#a34e00';
         const bottom = darken('#ffd6a0', 0.18);
-        return [top, bottom];
+        return [bottom, top];
       }
       case 4: {
         const top = '#a0003d';
         const bottom = darken('#ffb3c9', 0.18);
-        return [top, bottom];
+        return [bottom, top];
       }
       default: {
         const top = '#7a5a00';
         const bottom = darken('#ffe08a', 0.18);
-        return [top, bottom];
+        return [bottom, top];
       }
     }
   };
@@ -101,31 +101,39 @@ export const CoinPack = ({
   };
 
   return (
-    <Pressable sound={SOUNDS.BUTTON_CLICK}>
-      <LinearGradient
-        colors={getGradientColors(id)}
-        start={{x: 0.5, y: 0}}
-        end={{x: 0.5, y: 1}}
-        style={styles.container}
-      >
-        <View style={styles.imageContainer}>
-          <Image
-            source={getCoinPackImage()}
-            style={[styles.image, extraImageStyle(id)]}
-          />
+    <LinearGradient
+      colors={getGradientColors(id)}
+      start={{x: 0.5, y: 0}}
+      end={{x: 0.5, y: 1}}
+      style={styles.container}>
+      <View style={styles.imageContainer}>
+        <Image
+          source={getCoinPackImage()}
+          style={[styles.image, extraImageStyle(id)]}
+        />
+      </View>
+      <View style={styles.infoContainer}>
+        <View style={styles.coinRaw}>
+          <CoinSvg width={14} height={14} />
+          <EQText style={styles.coinText}>{formatCoinCount(coinAmount)}</EQText>
         </View>
-        <View style={styles.infoContainer}>
-          <View style={styles.coinRaw}>
-            <CoinSvg width={14} height={14} />
-            <EQText style={styles.coinText}>{coinAmount}</EQText>
-          </View>
-          {bonusAmount > 0 && (
-            <EQText style={styles.bonusText}>+{bonusAmount} Bonus</EQText>
-          )}
-        </View>
-        <EQText style={styles.priceText}>₺{price}</EQText>
-      </LinearGradient>
-    </Pressable>
+        {bonusAmount > 0 && (
+          <EQText style={styles.bonusText}>+{bonusAmount} Bonus</EQText>
+        )}
+      </View>
+      <Pressable
+        sound={SOUNDS.BUTTON_CLICK}
+        style={styles.priceButton}
+        onPress={() => {}}>
+        <LinearGradient
+          colors={['#A8FF78', darken('#009245', 0.2)]}
+          start={{x: 0, y: 0}}
+          style={styles.proButtonGradient}
+          end={{x: 0, y: 1}}>
+          <EQText style={styles.priceText}>₺{price}</EQText>
+        </LinearGradient>
+      </Pressable>
+    </LinearGradient>
   );
 };
 
@@ -147,6 +155,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
+    backgroundColor: 'transparent',
+    shadowColor: colors.black,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   infoContainer: {
     gap: 2,
@@ -169,10 +182,18 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   priceText: {
-    marginLeft: 'auto',
-    fontSize: 18,
     fontFamily: fonts.bold,
     color: colors.white,
+  },
+  priceButton: {
+    marginLeft: 'auto',
+    borderRadius: 8,
+    padding: 12,
+    overflow: 'hidden',
+  },
+  proButtonGradient: {
+    padding: 8,
+    borderRadius: 8,
   },
   animatedLine: {
     position: 'absolute',

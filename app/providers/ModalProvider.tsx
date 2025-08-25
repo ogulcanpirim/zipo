@@ -1,10 +1,12 @@
 import React, {useMemo, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, TouchableWithoutFeedback} from 'react-native';
 import {
   ModalContext,
   ModalContextValue,
   PortalModalProps,
 } from '../contexts/ModalContext';
+import {useSound} from '../hooks/useSound';
+import {SOUNDS} from '../models/game';
 
 interface ModalProviderProps {
   children: React.ReactNode;
@@ -12,6 +14,7 @@ interface ModalProviderProps {
 
 export const ModalProvider = ({children}: ModalProviderProps) => {
   const [content, setContent] = useState<React.ReactNode>(null);
+  const {play} = useSound();
 
   const modalContext: ModalContextValue = useMemo(
     () => ({
@@ -23,13 +26,21 @@ export const ModalProvider = ({children}: ModalProviderProps) => {
     [],
   );
 
+  const handleClose = () => {
+    play(SOUNDS.BUTTON_CLICK);
+    modalContext.close();
+  };
+
   return (
     <ModalContext.Provider value={modalContext}>
       <>
         {children}
         {content ? (
-          <View onTouchEnd={modalContext.close} style={styles.overlay}>
-            {content}
+          <View style={styles.overlay}>
+            <TouchableWithoutFeedback onPress={handleClose}>
+              <View style={StyleSheet.absoluteFill} />
+            </TouchableWithoutFeedback>
+            <View style={styles.content}>{content}</View>
           </View>
         ) : null}
       </>
@@ -48,5 +59,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.75)',
     zIndex: 99,
+  },
+  content: {
+    zIndex: 100,
   },
 });

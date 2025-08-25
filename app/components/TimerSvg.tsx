@@ -1,83 +1,155 @@
 import React from 'react';
+import {StyleSheet, View} from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 import Svg, {G, Path} from 'react-native-svg';
 
 interface SvgProps {
   width?: number;
   height?: number;
+  animated?: boolean;
 }
 
-export const TimerSvg = ({width, height}: SvgProps) => {
+const TimerSvgComponent = ({width, height, animated}: SvgProps) => {
+  const rotate = useSharedValue(0);
+
+  rotate.value = withRepeat(withTiming(360, {duration: 3000}), -1);
+
+  const scale = useDerivedValue(() => {
+    return interpolate(rotate.value, [0, 180, 360], [1, 1.15, 1]);
+  });
+
+  const animatedStyle = useAnimatedStyle(() => {
+    if (!animated) {
+      return {};
+    }
+    return {
+      transform: [{rotate: `${rotate.value}deg`}],
+      transformOrigin: 'bottom',
+    };
+  }, []);
+
+  const animatedContainerStyle = useAnimatedStyle(() => {
+    if (!animated) {
+      return {};
+    }
+    return {
+      transform: [{scale: scale.value}],
+    };
+  });
+
   return (
-    <Svg
-      height={height || '800px'}
-      width={width || '800px'}
-      viewBox="0 0 512 512">
-      <Path
-        fill="#51B3DA"
-        d="M290.772,0h-69.544c-11.153,0-20.194,9.042-20.194,20.194s9.042,20.194,20.194,20.194h14.578v37.404
+    <Animated.View style={animatedContainerStyle}>
+      <Svg
+        height={height || '800px'}
+        width={width || '800px'}
+        viewBox="0 0 512 512">
+        <Path
+          fill="#51B3DA"
+          d="M290.772,0h-69.544c-11.153,0-20.194,9.042-20.194,20.194s9.042,20.194,20.194,20.194h14.578v37.404
 	c0,11.153,9.042,20.194,20.194,20.194c11.153,0,20.194-9.042,20.194-20.194V40.389h14.578c11.153,0,20.194-9.042,20.194-20.194
 	S301.926,0,290.772,0z"
-      />
-      <Path
-        fill="#39A3DB"
-        d="M290.772,0H256v97.987c11.153,0,20.194-9.042,20.194-20.194V40.389h14.578
+        />
+        <Path
+          fill="#39A3DB"
+          d="M290.772,0H256v97.987c11.153,0,20.194-9.042,20.194-20.194V40.389h14.578
 	c11.153,0,20.194-9.042,20.194-20.194S301.926,0,290.772,0z"
-      />
-      <Path
-        fill="#FFEDBE"
-        d="M256,512C130.721,512,28.799,410.078,28.799,284.799S130.723,57.598,256,57.598
+        />
+        <Path
+          fill="#FFEDBE"
+          d="M256,512C130.721,512,28.799,410.078,28.799,284.799S130.723,57.598,256,57.598
 	S483.201,159.52,483.201,284.799S381.279,512,256,512z"
-      />
-      <Path
-        fill="#FFE49C"
-        d="M256,57.598v454.4c125.279,0,227.201-101.922,227.201-227.201S381.279,57.598,256,57.598z"
-      />
-      <Path
-        fill="#FF5E5B"
-        d="M345.808,194.99c-7.885-7.885-20.672-7.885-28.559,0l-58.178,58.18
+        />
+        <Path
+          fill="#FFE49C"
+          d="M256,57.598v454.4c125.279,0,227.201-101.922,227.201-227.201S381.279,57.598,256,57.598z"
+        />
+        {!animated && (
+          <Path
+            fill="#FF5E5B"
+            d="M345.808,194.99c-7.885-7.885-20.672-7.885-28.559,0l-58.178,58.18
 	c-18.809-1.804-34.85,12.976-34.85,31.628c0,17.552,14.228,31.779,31.779,31.779c18.65,0,33.431-16.034,31.628-34.85l58.178-58.18
 	C353.696,215.662,353.696,202.875,345.808,194.99z"
-      />
-      <G>
-        <Path
-          fill="#FFBE00"
-          d="M256,152.863c-11.153,0-20.194-9.042-20.194-20.194V91.255c0-11.153,9.042-20.194,20.194-20.194
+          />
+        )}
+        <G>
+          <Path
+            fill="#FFBE00"
+            d="M256,152.863c-11.153,0-20.194-9.042-20.194-20.194V91.255c0-11.153,9.042-20.194,20.194-20.194
 		s20.194,9.042,20.194,20.194v41.413C276.194,143.821,267.153,152.863,256,152.863z"
-        />
-        <Path
-          fill="#FFBE00"
-          d="M256,498.537c-11.153,0-20.194-9.042-20.194-20.194v-41.415c0-11.153,9.042-20.194,20.194-20.194
+          />
+          <Path
+            fill="#FFBE00"
+            d="M256,498.537c-11.153,0-20.194-9.042-20.194-20.194v-41.415c0-11.153,9.042-20.194,20.194-20.194
 		s20.194,9.042,20.194,20.194v41.415C276.194,489.495,267.153,498.537,256,498.537z"
-        />
-        <Path
-          fill="#FFBE00"
-          d="M103.871,304.993H62.458c-11.153,0-20.194-9.042-20.194-20.194s9.042-20.194,20.194-20.194h41.415
+          />
+          <Path
+            fill="#FFBE00"
+            d="M103.871,304.993H62.458c-11.153,0-20.194-9.042-20.194-20.194s9.042-20.194,20.194-20.194h41.415
 		c11.153,0,20.194,9.042,20.194,20.194S115.025,304.993,103.871,304.993z"
-        />
-      </G>
-      <Path
-        fill="#FF423D"
-        d="M345.808,194.99c-7.885-7.885-20.672-7.885-28.559,0l-58.178,58.18
+          />
+        </G>
+        {!animated && (
+          <Path
+            fill="#FF423D"
+            d="M345.808,194.99c-7.885-7.885-20.672-7.885-28.559,0l-58.178,58.18
 	c-1.011-0.097-2.034-0.151-3.071-0.151v63.56c18.65,0,33.431-16.034,31.628-34.85l58.178-58.18
 	C353.696,215.662,353.696,202.875,345.808,194.99z"
-      />
-      <G>
-        <Path
-          fill="#FFAF00"
-          d="M256,71.061v81.802c11.153,0,20.194-9.042,20.194-20.194V91.255
+          />
+        )}
+        <G>
+          <Path
+            fill="#FFAF00"
+            d="M256,71.061v81.802c11.153,0,20.194-9.042,20.194-20.194V91.255
 		C276.194,80.103,267.153,71.061,256,71.061z"
-        />
-        <Path
-          fill="#FFAF00"
-          d="M256,416.734v81.803c11.153,0,20.194-9.042,20.194-20.194v-41.415
+          />
+          <Path
+            fill="#FFAF00"
+            d="M256,416.734v81.803c11.153,0,20.194-9.042,20.194-20.194v-41.415
 		C276.194,425.776,267.153,416.734,256,416.734z"
-        />
-        <Path
-          fill="#FFAF00"
-          d="M449.544,304.993h-41.414c-11.153,0-20.194-9.042-20.194-20.194s9.042-20.194,20.194-20.194h41.414
+          />
+          <Path
+            fill="#FFAF00"
+            d="M449.544,304.993h-41.414c-11.153,0-20.194-9.042-20.194-20.194s9.042-20.194,20.194-20.194h41.414
 		c11.153,0,20.194,9.042,20.194,20.194S460.696,304.993,449.544,304.993z"
-        />
-      </G>
-    </Svg>
+          />
+        </G>
+      </Svg>
+      {animated && (
+        <>
+          <View style={[styles.dot]} />
+          <Animated.View style={[styles.line, animatedStyle]} />
+        </>
+      )}
+    </Animated.View>
   );
 };
+
+export const TimerSvg = React.memo(TimerSvgComponent);
+
+const styles = StyleSheet.create({
+  dot: {
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FF423D',
+    alignSelf: 'center',
+    bottom: 22,
+  },
+  line: {
+    position: 'absolute',
+    width: 4.8,
+    borderRadius: 6,
+    height: 16,
+    bottom: 26,
+    backgroundColor: '#FF423D',
+    alignSelf: 'center',
+  },
+});

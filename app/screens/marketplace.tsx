@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {
   Image,
   ImageBackground,
@@ -24,6 +24,14 @@ import Animated, {
   withSequence,
   withSpring,
 } from 'react-native-reanimated';
+import {useAppSelector} from '../hooks/useAppSelector';
+import {
+  formatCoinCount,
+  getCoinPacks,
+  getCollectorRewardPerHour,
+} from '../utils/helpers';
+
+//fdd936, ec4079
 
 function darken(hex: string, percent: number): string {
   hex = hex.replace(/^#/, '');
@@ -40,42 +48,21 @@ function darken(hex: string, percent: number): string {
     .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 
-const COIN_PACKS = [
-  {
-    id: 1,
-    coin: 1000,
-    bonus: 100,
-    price: 49.99,
-  },
-  {
-    id: 2,
-    coin: 5000,
-    bonus: 500,
-    price: 159.99,
-  },
-  {
-    id: 3,
-    coin: 10000,
-    bonus: 1000,
-    price: 499.99,
-  },
-  {
-    id: 4,
-    coin: 40000,
-    bonus: 4000,
-    price: 999.99,
-  },
-];
-
 export const MarketplaceScreen = () => {
   const proScale = useSharedValue(1);
+  const {currentLevel} = useAppSelector(state => state.userData);
+
+  const coinPacks = useMemo(() => {
+    return getCoinPacks(currentLevel);
+  }, [currentLevel]);
+
+  const premiumCoin = useMemo(() => {
+    return getCollectorRewardPerHour(currentLevel) * 100;
+  }, [currentLevel]);
+
   const handlePremiumPress = () => {};
 
-  const premiumGradientColors = [
-    darken('#FFD700', 0.4),
-    darken('#FFA500', 0.4),
-    darken('#FF8C00', 0.4),
-  ];
+  const premiumGradientColors = [darken('#FBC12D', 0.2), '#EC4079'];
 
   proScale.value = withRepeat(
     withSequence(
@@ -104,11 +91,13 @@ export const MarketplaceScreen = () => {
         showsVerticalScrollIndicator={false}>
         {/* Premium Section */}
         <Animated.View style={[styles.section, animatedProContainerStyle]}>
-          <EQText style={styles.sectionTitle}>Premium</EQText>
-          <Pressable
-            sound={SOUNDS.BUTTON_CLICK}
-            style={styles.premiumCard}
-            onPress={handlePremiumPress}>
+          <View style={styles.premiumCard}>
+            <View style={styles.imageContainer}>
+              <Image
+                source={require('../assets/images/pro.png')}
+                style={styles.image}
+              />
+            </View>
             <LinearGradient
               style={styles.premiumGradient}
               colors={premiumGradientColors}
@@ -116,10 +105,6 @@ export const MarketplaceScreen = () => {
               end={{x: 0, y: 1}}>
               <View style={styles.premiumContent}>
                 <View style={styles.premiumHeader}>
-                  <Image
-                    source={require('../assets/images/pro.png')}
-                    style={styles.image}
-                  />
                   <View style={styles.premiumTitleSection}>
                     <EQText style={styles.premiumTitle}>Premium</EQText>
                     <EQText style={styles.premiumSubtitle}>
@@ -152,8 +137,23 @@ export const MarketplaceScreen = () => {
                     />
                     <View style={styles.itemRow}>
                       <CoinSvg width={14} height={14} />
-                      <EQText style={styles.featureText}>5000 reward</EQText>
+                      <EQText style={styles.featureText}>
+                        <EQText style={styles.coin}>
+                          {formatCoinCount(premiumCoin)}
+                        </EQText>
+                        {' reward'}
+                      </EQText>
                     </View>
+                  </View>
+                  <View style={styles.featureRow}>
+                    <FontAwesome6
+                      name="check-circle"
+                      size={16}
+                      color={colors.white}
+                    />
+                    <EQText style={styles.featureText}>
+                      2x Idle Income Boost
+                    </EQText>
                   </View>
                   <View style={styles.featureRow}>
                     <FontAwesome6
@@ -166,20 +166,31 @@ export const MarketplaceScreen = () => {
                     </EQText>
                   </View>
                 </View>
-                <EQText style={styles.premiumPrice}>₺199.99</EQText>
+                <Pressable
+                  sound={SOUNDS.BUTTON_CLICK}
+                  style={styles.proButton}
+                  onPress={handlePremiumPress}>
+                  <LinearGradient
+                    colors={['#A8FF78', darken('#009245', 0.2)]}
+                    start={{x: 0, y: 0}}
+                    style={styles.proButtonGradient}
+                    end={{x: 0, y: 1}}>
+                    <EQText style={styles.premiumPrice}>₺299.99</EQText>
+                  </LinearGradient>
+                </Pressable>
               </View>
             </LinearGradient>
-          </Pressable>
+          </View>
         </Animated.View>
         {/* Coin Packs Section */}
         <View style={styles.section}>
           <EQText style={styles.sectionTitle}>Coin Packs</EQText>
           <View style={styles.coinPacksContainer}>
-            {COIN_PACKS.map(pack => (
+            {coinPacks.map(pack => (
               <CoinPack
                 key={pack.id}
                 id={pack.id}
-                coinAmount={pack.coin}
+                coinAmount={pack.coins}
                 bonusAmount={pack.bonus}
                 price={pack.price}
               />
@@ -203,6 +214,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 100,
+    paddingTop: 40,
   },
   section: {
     marginBottom: 30,
@@ -215,28 +227,41 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   premiumCard: {
-    width: '100%',
     borderRadius: 12,
+  },
+  imageContainer: {
+    position: 'absolute',
+    alignSelf: 'center',
+    top: -40,
+    zIndex: 100,
   },
   premiumGradient: {
     padding: 20,
+    paddingTop: 40,
     borderRadius: 12,
   },
   premiumContent: {
-    gap: 20,
+    gap: 12,
   },
   premiumHeader: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: 15,
   },
   image: {
-    width: 50,
-    height: 50,
+    width: 75,
+    height: 75,
     resizeMode: 'contain',
+    backgroundColor: 'transparent',
+    shadowColor: colors.black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   premiumTitleSection: {
-    flex: 1,
+    alignItems: 'center',
   },
   premiumTitle: {
     fontSize: 20,
@@ -266,14 +291,26 @@ const styles = StyleSheet.create({
     fontFamily: fonts.medium,
     color: colors.white,
   },
+  coin: {
+    fontFamily: fonts.bold,
+    color: colors.white,
+  },
   premiumPriceContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'center',
     gap: 4,
   },
+  proButton: {
+    alignSelf: 'center',
+  },
+  proButtonGradient: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+  },
   premiumPrice: {
-    fontSize: 24,
+    fontSize: 16,
     fontFamily: fonts.bold,
     color: colors.white,
     alignSelf: 'center',

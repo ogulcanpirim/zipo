@@ -1,6 +1,8 @@
 import {getUniqueId} from 'react-native-device-info';
 import {storage} from '../store';
 import {supabase, TABLES} from '../core/supabase';
+import {LAST_COLLECTED_TIME} from '../constants/game';
+import moment from 'moment';
 
 export const useUser = () => {
   const checkUser = async () => {
@@ -14,6 +16,17 @@ export const useUser = () => {
   };
 
   const updateUser = async () => {
+    //Collector
+    if (!storage.getString(LAST_COLLECTED_TIME)) {
+      storage.set(LAST_COLLECTED_TIME, moment().toISOString());
+    }
+    // Test the functionality
+    // else {
+    //   storage.set(
+    //     LAST_COLLECTED_TIME,
+    //     moment().subtract(5, 'hours').toISOString(),
+    //   );
+    // }
     const userData = JSON.parse(
       storage.getString('persist:root') || '{}',
     )?.userData;

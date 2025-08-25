@@ -1,39 +1,78 @@
-import React from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Animated, {ZoomIn, ZoomOut} from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+  ZoomIn,
+  ZoomOut,
+} from 'react-native-reanimated';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
 import {useModal} from '../hooks/useModal';
 import {SOUNDS} from '../models/game';
-import {formatCoinCount} from '../utils/helpers';
+import {formatCoinCount, getCollectorRewardPerHour} from '../utils/helpers';
 import CoinSvg from './CoinSvg';
 import {CoinWrap} from './CoinWrap';
 import {EQText} from './EQText';
 import {Pressable} from './Pressable';
 import {TimerSvg} from './TimerSvg';
+import {useAppSelector} from '../hooks/useAppSelector';
+import {useCollector} from '../hooks/useCollector';
+import {MAX_WAIT_TIME} from '../constants/game';
+import {useAppDispatch} from '../store';
+import {incrementCoin} from '../store/slicers/user.slice';
 
 export const Collector = () => {
+  const dispatch = useAppDispatch();
+  const progressWidth = useSharedValue(0);
+  const {currentLevel} = useAppSelector(state => state.userData);
   const {close} = useModal();
+  const {getCollactableReward, getIdleTime, collectReward} = useCollector();
 
-  const earnedCoin = 12400;
-  const handleClose = () => {
-    close();
+  const collectibleReward = getCollactableReward();
+  const idleTime = getIdleTime();
+  const [collected, setCollected] = useState(idleTime < 1);
+
+  const collect = () => {
+    collectReward();
+    dispatch(incrementCoin(collectibleReward));
+    setCollected(true);
+    progressWidth.value = withTiming(0, {duration: 500});
   };
+
+  const earnedPerHour = useMemo(() => {
+    return getCollectorRewardPerHour(currentLevel);
+  }, [currentLevel]);
+
+  useEffect(() => {
+    const toValue = (idleTime / MAX_WAIT_TIME) * 100;
+    progressWidth.value = withDelay(250, withTiming(toValue, {duration: 500}));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const animatedProgressStyle = useAnimatedStyle(() => ({
+    width: `${progressWidth.value}%`,
+  }));
+
+  const buttonDisabled = collected || idleTime < 1;
+
   return (
     <Animated.View
       style={styles.modalContainer}
       entering={ZoomIn.duration(200)}
       exiting={ZoomOut.duration(200)}>
       <View style={styles.icon}>
-        <TimerSvg width={60} height={60} />
+        <TimerSvg width={60} height={60} animated />
       </View>
       <EQText style={styles.headerTitle}>Collector</EQText>
       <Pressable
         style={styles.closeButton}
         sound={SOUNDS.BUTTON_CLICK}
-        onPress={handleClose}
+        onPress={close}
         hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
         <View style={styles.closeContainer}>
           <FontAwesome6Icon name="xmark" size={20} color={colors.white} />
@@ -41,28 +80,43 @@ export const Collector = () => {
       </Pressable>
       <View style={styles.content}>
         <View style={styles.coinWrapper}>
-          <CoinWrap text={`${formatCoinCount(12400)}/hour`} />
+          <CoinWrap text={`${formatCoinCount(earnedPerHour)}/hour`} />
         </View>
-        <EQText style={styles.idleTime}>{'Idle time: 5 hours'}</EQText>
+        <EQText
+          style={styles.idleTime}>{`Idle time: ${idleTime} hours`}</EQText>
         <EQText style={styles.idleDesc}>Max Idle income: 8 hours</EQText>
         <View style={styles.progressContainer}>
-          <View style={styles.progress} />
+          <Animated.View style={[styles.progress, animatedProgressStyle]} />
         </View>
+        <EQText style={styles.idleDesc}>
+          Collector reward increases with your current level.
+        </EQText>
         <View style={styles.buttons}>
           <Pressable
             sound={SOUNDS.BUTTON_CLICK}
-            onPress={() => {}}
-            style={styles.addPressable}>
+            onPress={collect}
+            disabled={buttonDisabled}
+            style={[styles.addPressable, buttonDisabled && styles.disabled]}>
             <LinearGradient
-              colors={['#A8FF78', '#009245']}
+              colors={
+                buttonDisabled ? [colors.darkBorder] : ['#A8FF78', '#009245']
+              }
               start={{x: 0, y: 0}}
               end={{x: 0, y: 1}}
               style={styles.adButton}>
-              <EQText style={styles.costText}>{'Collect'}</EQText>
-              <CoinSvg width={14} height={14} />
-              <EQText style={styles.costText}>
-                {formatCoinCount(earnedCoin * 2)}
-              </EQText>
+              {idleTime > 1 ? (
+                <>
+                  <EQText style={styles.costText}>{'Collect'}</EQText>
+                  <CoinSvg width={14} height={14} />
+                  <EQText style={styles.costText}>
+                    {formatCoinCount(collectibleReward)}
+                  </EQText>
+                </>
+              ) : (
+                <EQText style={styles.costText}>
+                  {'Collectable at 1 Hour'}
+                </EQText>
+              )}
             </LinearGradient>
           </Pressable>
         </View>
@@ -105,7 +159,7 @@ const styles = StyleSheet.create({
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.error,
+    backgroundColor: '#FF423D',
     borderRadius: 10,
   },
   content: {
@@ -128,7 +182,7 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   progressContainer: {
-    marginTop: 12,
+    marginVertical: 12,
     width: '100%',
     height: 8,
     borderRadius: 4,
@@ -136,7 +190,7 @@ const styles = StyleSheet.create({
   },
   progress: {
     height: '100%',
-    width: '40%',
+    width: '50%',
     borderRadius: 4,
     backgroundColor: colors.yellow,
   },
@@ -146,6 +200,9 @@ const styles = StyleSheet.create({
   },
   addPressable: {
     borderRadius: 12,
+  },
+  disabled: {
+    opacity: 0.5,
   },
   adButton: {
     flexDirection: 'row',
