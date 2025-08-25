@@ -30,12 +30,19 @@ export const useUser = () => {
     const userData = JSON.parse(
       storage.getString('persist:root') || '{}',
     )?.userData;
-    const {coin, currentLevel} = JSON.parse(userData || '{}');
+    const {coin, currentLevel, isPro} = JSON.parse(userData || '{}');
     const id = await checkUser();
+    const formattedId = id.replaceAll('"', '');
     if (id && coin) {
       const {data, error} = await supabase
         .from(TABLES.PROFILES)
-        .upsert({id: id.replaceAll('"', ''), coin, level: currentLevel})
+        .upsert({
+          id: formattedId,
+          coin,
+          level: currentLevel,
+          is_pro: isPro,
+        })
+        .setHeader('x-user-id', formattedId)
         .select();
       if (error) {
         console.error('Error updating user:', JSON.stringify(error));
