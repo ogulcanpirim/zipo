@@ -1,32 +1,30 @@
 import React from 'react';
-import {Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {Image, StyleSheet} from 'react-native';
 import Animated, {ZoomIn, ZoomOut} from 'react-native-reanimated';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 import {colors} from '../constants/colors';
 import {fonts} from '../constants/fonts';
-import {useSound} from '../hooks/useSound';
+import {useModal} from '../hooks/useModal';
 import {SOUNDS} from '../models/game';
 import {EQText} from './EQText';
+import {Pressable} from './Pressable';
 
 export const GameFinishModal = () => {
-  const {play} = useSound();
-
-  const handleClose = () => {
-    play(SOUNDS.BUTTON_CLICK);
-  };
+  const {close} = useModal();
 
   return (
     <Animated.View
       style={styles.modalContainer}
-      entering={ZoomIn}
-      exiting={ZoomOut}>
+      entering={ZoomIn.duration(200)}
+      exiting={ZoomOut.duration(200)}>
       <EQText style={styles.headerTitle}>Congratulations</EQText>
-      <TouchableOpacity
+      <Pressable
         style={styles.closeButton}
-        onPress={handleClose}
+        onPress={close}
+        sound={SOUNDS.BUTTON_CLICK}
         hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
         <FontAwesome6Icon name="xmark" size={24} color={colors.white} />
-      </TouchableOpacity>
+      </Pressable>
       <Image
         source={require('../assets/images/trophy.png')}
         style={styles.image}
