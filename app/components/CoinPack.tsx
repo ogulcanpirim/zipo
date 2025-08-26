@@ -43,7 +43,7 @@ export const CoinPack = ({
   const getGradientColors = (containerId: number): string[] => {
     switch (containerId) {
       case 1: {
-        const top = '#7a5a00';
+        const top = '#19951bff';
         const bottom = darken('#ffe08a', 0.18);
         return [bottom, top];
       }
