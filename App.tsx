@@ -8,8 +8,11 @@ import AppNavigationContainer from './app/navigation/AppNavigation';
 import LoaderProvider from './app/providers/LoaderProvider';
 import redux from './app/store';
 import {configureReanimatedLogger} from 'react-native-reanimated';
+import mobileAds from 'react-native-google-mobile-ads';
 
 configureReanimatedLogger({strict: false});
+
+mobileAds().initialize();
 
 const App = () => {
   const [visible, setVisible] = useState(true);
