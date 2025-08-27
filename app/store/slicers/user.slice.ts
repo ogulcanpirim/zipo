@@ -17,6 +17,8 @@ interface UserDataState {
     soundEnabled: boolean;
     vibrateEnabled: boolean;
   };
+  marketplace_enabled: boolean;
+  ads_enabled: boolean;
 }
 
 const initialState: UserDataState = {
@@ -34,6 +36,8 @@ const initialState: UserDataState = {
     soundEnabled: true,
     vibrateEnabled: true,
   },
+  marketplace_enabled: false,
+  ads_enabled: false,
 };
 
 export const userSlicer = createSlice({
@@ -119,6 +123,11 @@ export const userSlicer = createSlice({
     setVibrate: (state, action) => {
       state.settings.vibrateEnabled = action.payload;
     },
+    updateFromCMS: (state, action) => {
+      const {ads, marketplace} = action.payload;
+      state.ads_enabled = ads;
+      state.marketplace_enabled = marketplace;
+    },
   },
 });
 
@@ -142,5 +151,6 @@ export const {
   setPro,
   setSound,
   setVibrate,
+  updateFromCMS,
 } = userSlicer.actions;
 export default userSlicer.reducer;

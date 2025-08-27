@@ -23,9 +23,13 @@ import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 import {DEV_MODE_ENABLED} from '../constants/game';
 import {SettingsSheet} from '../components/SettingsSheet';
+import {useAppSelector} from '../hooks/useAppSelector';
 
 export const DashboardScreen = () => {
   const navigation = useAppNavigation();
+  const marketplace_enabled = useAppSelector(
+    state => state.userData.marketplace_enabled,
+  );
   const {expand} = useBottomSheet();
 
   const handleLevelsPress = () => {
@@ -128,26 +132,28 @@ export const DashboardScreen = () => {
                 </View>
               </LinearGradient>
             </Pressable>
-            <Pressable
-              style={styles.sectionCard}
-              onPress={handleMarketplacePress}
-              sound={SOUNDS.BUTTON_CLICK}>
-              <LinearGradient
-                style={styles.sectionGradient}
-                colors={['#FF9800', '#E65100']}
-                start={{x: 0, y: 0}}
-                end={{x: 0, y: 1}}>
-                <View style={styles.sectionContent}>
-                  <FontAwesome6
-                    name="store"
-                    size={20}
-                    color={colors.white}
-                    style={styles.sectionIcon}
-                  />
-                  <EQText style={styles.sectionText}>Marketplace</EQText>
-                </View>
-              </LinearGradient>
-            </Pressable>
+            {marketplace_enabled && (
+              <Pressable
+                style={styles.sectionCard}
+                onPress={handleMarketplacePress}
+                sound={SOUNDS.BUTTON_CLICK}>
+                <LinearGradient
+                  style={styles.sectionGradient}
+                  colors={['#FF9800', '#E65100']}
+                  start={{x: 0, y: 0}}
+                  end={{x: 0, y: 1}}>
+                  <View style={styles.sectionContent}>
+                    <FontAwesome6
+                      name="store"
+                      size={20}
+                      color={colors.white}
+                      style={styles.sectionIcon}
+                    />
+                    <EQText style={styles.sectionText}>Marketplace</EQText>
+                  </View>
+                </LinearGradient>
+              </Pressable>
+            )}
             <Pressable
               style={styles.sectionCard}
               onPress={handleThemePress}

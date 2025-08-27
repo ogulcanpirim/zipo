@@ -35,7 +35,7 @@ export const ActionButtonsContainer = ({
     return {
       clear: Math.round(coinReward * 0.2),
       undo: Math.round(coinReward * 0.1),
-      solve: Math.round(coinReward * 0.8),
+      solve: Math.round(coinReward * 0.95),
     };
   }, [coinReward]);
 

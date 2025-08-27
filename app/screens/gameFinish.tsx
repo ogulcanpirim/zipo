@@ -51,7 +51,9 @@ export const GameFinishScreen = () => {
   const [rewardEarned, setRewardEarned] = useState(false);
   const earnedCoin = route.params?.rewardCoin ?? 0;
 
-  const {currentLevel, gameFinished} = useAppSelector(state => state.userData);
+  const {currentLevel, gameFinished, ads_enabled} = useAppSelector(
+    state => state.userData,
+  );
   const maxLevelReached = currentLevel >= MAX_LEVEL;
   const levelAlreadyCompleted = route.params?.level_id
     ? currentLevel > route.params.level_id || gameFinished
@@ -165,7 +167,8 @@ export const GameFinishScreen = () => {
               <EQText style={styles.buttonText}>Close</EQText>
             </Pressable>
           ) : (
-            !gameFinished && (
+            !gameFinished &&
+            ads_enabled && (
               <Pressable
                 sound={SOUNDS.BUTTON_CLICK}
                 onPress={onPressDoubleCoin}

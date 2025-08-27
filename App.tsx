@@ -29,10 +29,10 @@ const App = () => {
             <AppNavigationContainer />
           </LoaderProvider>
         </PersistGate>
+        {visible && (
+          <AnimatedBootsplashContainer onAnimationEnd={hideBootsplash} />
+        )}
       </Provider>
-      {visible && (
-        <AnimatedBootsplashContainer onAnimationEnd={hideBootsplash} />
-      )}
     </GestureHandlerRootView>
   );
 };
