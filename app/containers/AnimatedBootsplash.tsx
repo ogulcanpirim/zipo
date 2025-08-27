@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Animated, Dimensions, StyleSheet} from 'react-native';
 import BootSplash from 'react-native-bootsplash';
 import {useUser} from '../hooks/useUser';
+import {useCMS} from '../hooks/useCMS';
 
 interface AnimatedBootsplashContainerProps {
   onAnimationEnd: () => void;
@@ -13,6 +14,7 @@ const AnimatedBootsplashContainer = ({
   const [opacity] = useState(() => new Animated.Value(1));
   const [translateY] = useState(() => new Animated.Value(0));
   const {updateUser} = useUser();
+  const {updateSettings} = useCMS();
   const {container, logo} = BootSplash.useHideAnimation({
     manifest: require('../../assets/bootsplash/manifest.json'),
     logo: require('../../assets/bootsplash/logo.png'),
@@ -20,6 +22,7 @@ const AnimatedBootsplashContainer = ({
     navigationBarTranslucent: false,
     animate: async () => {
       await updateUser();
+      await updateSettings();
       const {height} = Dimensions.get('window');
       Animated.stagger(250, [
         Animated.spring(translateY, {

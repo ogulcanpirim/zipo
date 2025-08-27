@@ -8,4 +8,5 @@ export const supabase = createClient(
 
 export enum TABLES {
   PROFILES = 'profiles',
+  CMS = 'cms',
 }

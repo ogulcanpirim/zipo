@@ -11,10 +11,12 @@ import {ThemesScreen} from '../screens/themes';
 import {SCREENS} from './screens';
 import {DEV_MODE_ENABLED} from '../constants/game';
 import {AdBanner} from '../components/AdBanner';
+import {useAppSelector} from '../hooks/useAppSelector';
 
 const Stack = createNativeStackNavigator();
 
 export const GeneralStack = () => {
+  const ads_enabled = useAppSelector(state => state.userData.ads_enabled);
   return (
     <>
       <Stack.Navigator
@@ -44,7 +46,7 @@ export const GeneralStack = () => {
           <Stack.Screen name={SCREENS.DEV_MODE} component={DevModeScreen} />
         )}
       </Stack.Navigator>
-      <AdBanner />
+      {ads_enabled && <AdBanner />}
     </>
   );
 };
