@@ -36,8 +36,8 @@ const initialState: UserDataState = {
     soundEnabled: true,
     vibrateEnabled: true,
   },
-  marketplace_enabled: false,
-  ads_enabled: false,
+  marketplace_enabled: true,
+  ads_enabled: true,
 };
 
 export const userSlicer = createSlice({
