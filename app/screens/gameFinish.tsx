@@ -106,12 +106,10 @@ export const GameFinishScreen = () => {
       return;
     }
     dispatch(incrementLevel());
-    dispatch(incrementCoin(route.params?.rewardCoin ?? 0));
     navigation.goBack();
   };
 
   const handleNextLevel = () => {
-    dispatch(incrementCoin(route.params?.rewardCoin ?? 0));
     dispatch(incrementLevel());
     const level = getCurrentLevel();
     navigation.navigate(SCREENS.GAME, {level});

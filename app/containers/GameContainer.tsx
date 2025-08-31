@@ -11,7 +11,7 @@ import {
   getDifficulty,
 } from '../utils/levelGenerator';
 import {useAppDispatch} from '../store';
-import {clearDraggedCells} from '../store/slicers/user.slice';
+import {clearDraggedCells, incrementCoin} from '../store/slicers/user.slice';
 
 interface GameContainerProps {
   level?: Level;
@@ -35,6 +35,7 @@ export const GameContainer = React.memo(
       setTimeout(() => {
         snapRef?.current?.capture?.().then((uri: string) => {
           dispatch(clearDraggedCells());
+          dispatch(incrementCoin(level?.coinReward));
           navigation.navigate(SCREENS.GAME_FINISH, {
             imageUri: uri,
             rewardCoin: level?.coinReward,

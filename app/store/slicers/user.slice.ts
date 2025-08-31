@@ -1,4 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
+import {PurchasesPackage} from 'react-native-purchases';
 import {MAX_LEVEL, START_COIN} from '../../constants/game';
 import {PATH_THEMES} from '../../constants/themes';
 
@@ -19,6 +20,8 @@ interface UserDataState {
   };
   marketplace_enabled: boolean;
   ads_enabled: boolean;
+  coin_packs: PurchasesPackage[];
+  premium_package: PurchasesPackage | null;
 }
 
 const initialState: UserDataState = {
@@ -38,6 +41,8 @@ const initialState: UserDataState = {
   },
   marketplace_enabled: true,
   ads_enabled: true,
+  coin_packs: [],
+  premium_package: null,
 };
 
 export const userSlicer = createSlice({
@@ -128,6 +133,12 @@ export const userSlicer = createSlice({
       state.ads_enabled = ads;
       state.marketplace_enabled = marketplace;
     },
+    updatePremiumPackage: (state, action) => {
+      state.premium_package = action.payload;
+    },
+    updateCoinPacks: (state, action) => {
+      state.coin_packs = action.payload;
+    },
   },
 });
 
@@ -152,5 +163,7 @@ export const {
   setSound,
   setVibrate,
   updateFromCMS,
+  updateCoinPacks,
+  updatePremiumPackage,
 } = userSlicer.actions;
 export default userSlicer.reducer;

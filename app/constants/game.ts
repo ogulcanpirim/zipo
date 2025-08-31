@@ -1,6 +1,6 @@
 import {ELevelDifficulty} from '../models/game';
 
-export const START_COIN = 500;
+export const START_COIN = 100;
 export const LEVEL_SIZES = {
   [ELevelDifficulty.BABY]: 200,
   [ELevelDifficulty.CHILD]: 200,
@@ -10,7 +10,7 @@ export const LEVEL_SIZES = {
 };
 export const MAX_LEVEL = 1100;
 
-export const COIN_PACKS = [
+export const COIN_PACKAGES = [
   {
     id: 1,
     price: 49.99,
@@ -37,3 +37,12 @@ export const LAST_COLLECTED_TIME = 'last_collected_time';
 export const MAX_WAIT_TIME = 8; // hours
 
 export const DEV_MODE_ENABLED = false;
+
+export enum OFFERINGS {
+  PREMIUM = 'premium',
+  COIN_PACKS = 'coin_packs',
+}
+
+export enum ENTITLEMENTS {
+  PRO = 'pro',
+}

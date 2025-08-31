@@ -16,7 +16,7 @@ import {useAppSelector} from '../hooks/useAppSelector';
 const Stack = createNativeStackNavigator();
 
 export const GeneralStack = () => {
-  const ads_enabled = useAppSelector(state => state.userData.ads_enabled);
+  const {ads_enabled, isPro} = useAppSelector(state => state.userData);
   return (
     <>
       <Stack.Navigator
@@ -46,7 +46,7 @@ export const GeneralStack = () => {
           <Stack.Screen name={SCREENS.DEV_MODE} component={DevModeScreen} />
         )}
       </Stack.Navigator>
-      {ads_enabled && <AdBanner />}
+      {ads_enabled && !isPro && <AdBanner />}
     </>
   );
 };
