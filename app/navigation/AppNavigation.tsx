@@ -10,6 +10,7 @@ import {SystemBars} from 'react-native-edge-to-edge';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {BottomSheetProvider} from '../providers/BottomsheetProvider';
 import {ModalProvider} from '../providers/ModalProvider';
+import {AdProvider} from '../providers/AdProvider';
 import {GeneralStack} from './GeneralStack';
 
 export const navigationRef = createNavigationContainerRef<ParamListBase>();
@@ -23,8 +24,10 @@ const AppNavigationContainer = () => {
       <SafeAreaProvider>
         <BottomSheetProvider>
           <ModalProvider>
-            <SystemBars style="light" />
-            <GeneralStack />
+            <AdProvider>
+              <SystemBars style="light" />
+              <GeneralStack />
+            </AdProvider>
           </ModalProvider>
         </BottomSheetProvider>
       </SafeAreaProvider>
