@@ -65,6 +65,9 @@ export const userSlicer = createSlice({
     incrementLevelCompletionCount: state => {
       state.levelCompletionCount += 1;
     },
+    resetLevelCompletionCount: state => {
+      state.levelCompletionCount = 0;
+    },
     resetLevel: state => {
       state.currentLevel = 1;
     },
@@ -152,6 +155,7 @@ export const {
   setCurrentLevel,
   incrementLevel,
   incrementLevelCompletionCount,
+  resetLevelCompletionCount,
   resetLevel,
   setCoin,
   incrementCoin,

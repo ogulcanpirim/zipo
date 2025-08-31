@@ -1,10 +1,15 @@
 import {supabase, TABLES} from '../core/supabase';
 import {useAppDispatch} from '../store';
-import {updateFromCMS} from '../store/slicers/user.slice';
+import {
+  resetLevelCompletionCount,
+  updateFromCMS,
+} from '../store/slicers/user.slice';
 
 export const useCMS = () => {
   const dispatch = useAppDispatch();
   const updateSettings = async () => {
+    // Reset Level Completion Count
+    dispatch(resetLevelCompletionCount());
     const {data, error} = await supabase.from(TABLES.CMS).select('*').single();
     if (!error) {
       dispatch(updateFromCMS(data));
