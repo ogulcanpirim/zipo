@@ -25,7 +25,7 @@ export const ActionButtonsContainer = ({
 }: ActionButtonsContainerProps) => {
   const dispatch = useAppDispatch();
   const [solving, setSolving] = useState(false);
-  const {currentDraggedCells, coin, moves} = useAppSelector(
+  const {currentDraggedCells, coin, moves, isPro} = useAppSelector(
     state => state.userData,
   );
   const actionEnabled =
@@ -33,11 +33,11 @@ export const ActionButtonsContainer = ({
 
   const prices = useMemo(() => {
     return {
-      clear: Math.round(coinReward * 0.2),
-      undo: Math.round(coinReward * 0.1),
-      solve: Math.round(coinReward * 1.50),
+      clear: isPro ? 0 : Math.round(coinReward * 0.2),
+      undo: isPro ? 0 : Math.round(coinReward * 0.1),
+      solve: isPro ? 0 : Math.round(coinReward * 1.5),
     };
-  }, [coinReward]);
+  }, [coinReward, isPro]);
 
   useEffect(() => {
     setSolving(false);
