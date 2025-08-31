@@ -18,23 +18,17 @@ import {useSound} from '../hooks/useSound';
 import {SOUNDS} from '../models/game';
 import {SCREENS} from '../navigation/screens';
 import {useAppDispatch} from '../store';
-import {incrementCoin, incrementLevel} from '../store/slicers/user.slice';
-import {formatCoinCount, getCurrentLevel} from '../utils/helpers';
 import {
-  RewardedAd,
-  RewardedAdEventType,
-  TestIds,
-} from 'react-native-google-mobile-ads';
+  incrementCoin,
+  incrementLevel,
+  incrementLevelCompletionCount,
+} from '../store/slicers/user.slice';
+import {formatCoinCount, getCurrentLevel} from '../utils/helpers';
 import {MAX_LEVEL} from '../constants/game';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import {useModal} from '../hooks/useModal';
 import {GameFinishModal} from '../components/GameFinishModal';
-
-const adUnitId = __DEV__
-  ? TestIds.REWARDED
-  : 'ca-app-pub-5097211111237502/3093415584';
-
-const rewarded = RewardedAd.createForAdRequest(adUnitId);
+import {useAd} from '../hooks/useAd';
 
 export const GameFinishScreen = () => {
   const dispatch = useAppDispatch();
@@ -47,13 +41,17 @@ export const GameFinishScreen = () => {
   >();
   const pathColor = useAppSelector(state => state.userData.pathColor);
   const {play} = useSound();
-  const [loaded, setLoaded] = useState(false);
   const [rewardEarned, setRewardEarned] = useState(false);
   const earnedCoin = route.params?.rewardCoin ?? 0;
+  const {
+    showRewardAd,
+    isRewardAdLoaded,
+    showInterstitialAdEveryThirdLevel,
+    reloadRewardAd,
+  } = useAd();
 
-  const {currentLevel, gameFinished, ads_enabled} = useAppSelector(
-    state => state.userData,
-  );
+  const {currentLevel, gameFinished, ads_enabled, levelCompletionCount} =
+    useAppSelector(state => state.userData);
   const maxLevelReached = currentLevel >= MAX_LEVEL;
   const levelAlreadyCompleted = route.params?.level_id
     ? currentLevel > route.params.level_id || gameFinished
@@ -65,36 +63,36 @@ export const GameFinishScreen = () => {
     if (currentLevel === MAX_LEVEL && !gameFinished) {
       expand({content: <GameFinishModal />});
     }
+
+    // Show interstitial ad every 3rd level completion
+    if (ads_enabled && !levelAlreadyCompleted) {
+      showInterstitialAdEveryThirdLevel(levelCompletionCount);
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const onPressDoubleCoin = () => {
-    if (!loaded) {
-      return;
-    }
-    rewarded.show();
-  };
 
   useEffect(() => {
-    const unsubscribeLoaded = rewarded.addAdEventListener(
-      RewardedAdEventType.LOADED,
-      () => {
-        setLoaded(true);
-      },
-    );
-    const unsubscribeEarned = rewarded.addAdEventListener(
-      RewardedAdEventType.EARNED_REWARD,
-      () => {
-        setRewardEarned(true);
-        dispatch(incrementCoin(earnedCoin * 2));
-      },
-    );
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeEarned();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!isRewardAdLoaded && ads_enabled && !rewardEarned) {
+      const timer = setTimeout(() => {
+        reloadRewardAd();
+      }, 10000); // 10 seconds timeout
+      return () => clearTimeout(timer);
+    }
+  }, [isRewardAdLoaded, ads_enabled, rewardEarned, reloadRewardAd]);
+
+  const onPressDoubleCoin = async () => {
+    // If ad is not loaded, try to reload it
+    if (!isRewardAdLoaded) {
+      reloadRewardAd();
+      return;
+    }
+    const earned = await showRewardAd();
+    if (earned) {
+      setRewardEarned(true);
+      dispatch(incrementCoin(earnedCoin * 2));
+    }
+  };
 
   const onPressIn = () => {
     play(SOUNDS.BUTTON_CLICK);
@@ -105,11 +103,13 @@ export const GameFinishScreen = () => {
       navigation.dispatch(StackActions.pop(2));
       return;
     }
+    dispatch(incrementLevelCompletionCount());
     dispatch(incrementLevel());
     navigation.goBack();
   };
 
   const handleNextLevel = () => {
+    dispatch(incrementLevelCompletionCount());
     dispatch(incrementLevel());
     const level = getCurrentLevel();
     navigation.navigate(SCREENS.GAME, {level});
@@ -170,14 +170,22 @@ export const GameFinishScreen = () => {
               <Pressable
                 sound={SOUNDS.BUTTON_CLICK}
                 onPress={onPressDoubleCoin}
-                style={[styles.addPressable, rewardEarned && styles.disabled]}>
+                disabled={!isRewardAdLoaded || rewardEarned}
+                style={[
+                  styles.addPressable,
+                  (!isRewardAdLoaded || rewardEarned) && styles.disabled,
+                ]}>
                 <LinearGradient
                   colors={['#FF6B35', '#8E3201']}
                   start={{x: 0, y: 0}}
                   end={{x: 0, y: 1}}
                   style={styles.adButton}>
                   <EQText style={styles.costText}>
-                    {rewardEarned ? 'Earned' : 'Collect'}
+                    {rewardEarned
+                      ? 'Earned'
+                      : isRewardAdLoaded
+                      ? 'Collect'
+                      : 'Loading...'}
                   </EQText>
                   <CoinSvg width={14} height={14} />
                   <EQText style={styles.costText}>

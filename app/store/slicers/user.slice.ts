@@ -22,6 +22,7 @@ interface UserDataState {
   ads_enabled: boolean;
   coin_packs: PurchasesPackage[];
   premium_package: PurchasesPackage | null;
+  levelCompletionCount: number;
 }
 
 const initialState: UserDataState = {
@@ -43,6 +44,7 @@ const initialState: UserDataState = {
   ads_enabled: true,
   coin_packs: [],
   premium_package: null,
+  levelCompletionCount: 0,
 };
 
 export const userSlicer = createSlice({
@@ -59,6 +61,9 @@ export const userSlicer = createSlice({
       } else {
         state.gameFinished = true;
       }
+    },
+    incrementLevelCompletionCount: state => {
+      state.levelCompletionCount += 1;
     },
     resetLevel: state => {
       state.currentLevel = 1;
@@ -118,6 +123,7 @@ export const userSlicer = createSlice({
       state.selectedTheme = 1;
       state.unlockedThemes = [1];
       state.gameFinished = false;
+      state.levelCompletionCount = 0;
     },
     setPro: (state, action) => {
       state.isPro = action.payload;
@@ -145,6 +151,7 @@ export const userSlicer = createSlice({
 export const {
   setCurrentLevel,
   incrementLevel,
+  incrementLevelCompletionCount,
   resetLevel,
   setCoin,
   incrementCoin,
