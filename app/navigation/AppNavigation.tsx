@@ -4,13 +4,13 @@ import {
   ParamListBase,
 } from '@react-navigation/native';
 import React from 'react';
-import {SystemBars} from 'react-native-edge-to-edge';
 import BootSplash from 'react-native-bootsplash';
+import {SystemBars} from 'react-native-edge-to-edge';
 
-import {GeneralStack} from './GeneralStack';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {BottomSheetProvider} from '../providers/BottomsheetProvider';
 import {ModalProvider} from '../providers/ModalProvider';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {GeneralStack} from './GeneralStack';
 
 export const navigationRef = createNavigationContainerRef<ParamListBase>();
 

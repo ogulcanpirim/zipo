@@ -7,13 +7,14 @@ import CoinSvg from './CoinSvg';
 import {EQText} from './EQText';
 import {Pressable} from './Pressable';
 import LinearGradient from 'react-native-linear-gradient';
-import { formatCoinCount } from '../utils/helpers';
+import {formatCoinCount} from '../utils/helpers';
 
 interface CoinPackProps {
   id: number;
   coinAmount: number;
   bonusAmount: number;
-  price: number;
+  price: string;
+  onPress: () => void;
 }
 
 // Helper to darken a hex color by a given percent
@@ -39,6 +40,7 @@ export const CoinPack = ({
   coinAmount,
   bonusAmount,
   price,
+  onPress,
 }: CoinPackProps) => {
   const getGradientColors = (containerId: number): string[] => {
     switch (containerId) {
@@ -124,13 +126,13 @@ export const CoinPack = ({
       <Pressable
         sound={SOUNDS.BUTTON_CLICK}
         style={styles.priceButton}
-        onPress={() => {}}>
+        onPress={onPress}>
         <LinearGradient
           colors={['#A8FF78', darken('#009245', 0.2)]}
           start={{x: 0, y: 0}}
           style={styles.proButtonGradient}
           end={{x: 0, y: 1}}>
-          <EQText style={styles.priceText}>₺{price}</EQText>
+          <EQText style={styles.priceText}>{price}</EQText>
         </LinearGradient>
       </Pressable>
     </LinearGradient>

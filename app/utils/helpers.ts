@@ -1,4 +1,5 @@
-import {COIN_PACKS, MAX_LEVEL} from '../constants/game';
+import {PurchasesPackage} from 'react-native-purchases';
+import {COIN_PACKAGES, MAX_LEVEL} from '../constants/game';
 import redux from '../store';
 
 export const getLevelData = (id: number) => {
@@ -81,10 +82,18 @@ export const getCollectorRewardPerHour = (level: number) => {
   return Math.round(reward * 0.15);
 };
 
-export const getCoinPacks = (level: number) => {
+interface Coin {
+  revenuePack: PurchasesPackage;
+  price: string;
+}
+
+export const getCoinPacks = (level: number, coins: Array<Coin>) => {
   const idlePerDay = getCollectorRewardPerHour(level) * 24;
-  return COIN_PACKS.map(pack => ({
+  return COIN_PACKAGES.map(pack => ({
     ...pack,
+    identifier: '',
+    price: coins[pack.id - 1]?.price ?? pack.price,
+    revenuePack: coins[pack.id - 1]?.revenuePack ?? pack,
     coins: Math.round(idlePerDay * pack.day),
     bonus: Math.round(idlePerDay * pack.day * 0.1), // 10% bonus
   }));
