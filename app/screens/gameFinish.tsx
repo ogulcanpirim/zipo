@@ -46,7 +46,7 @@ export const GameFinishScreen = () => {
   const {
     showRewardAd,
     isRewardAdLoaded,
-    showInterstitialAdEveryThirdLevel,
+    showInterstitialAdEveryFourthLevel,
     reloadRewardAd,
   } = useAd();
 
@@ -63,10 +63,8 @@ export const GameFinishScreen = () => {
     if (currentLevel === MAX_LEVEL && !gameFinished) {
       expand({content: <GameFinishModal />});
     }
-
-    // Show interstitial ad every 3rd level completion
     if (ads_enabled && !levelAlreadyCompleted) {
-      showInterstitialAdEveryThirdLevel(levelCompletionCount);
+      showInterstitialAdEveryFourthLevel(levelCompletionCount);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

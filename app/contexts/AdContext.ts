@@ -3,7 +3,7 @@ import {createContext} from 'react';
 export interface AdContextValue {
   showRewardAd: () => Promise<boolean>;
   showInterstitialAd: () => Promise<void>;
-  showInterstitialAdEveryThirdLevel: (levelCompletionCount: number) => Promise<void>;
+  showInterstitialAdEveryFourthLevel: (levelCompletionCount: number) => Promise<void>;
   reloadRewardAd: () => void;
   reloadInterstitialAd: () => void;
   isRewardAdLoaded: boolean;
