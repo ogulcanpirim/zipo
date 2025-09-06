@@ -22,7 +22,7 @@ export const AdProvider: React.FC<AdProviderProps> = ({children}) => {
   const rewardedAd = useMemo(
     () =>
       RewardedAd.createForAdRequest(
-        __DEV__ ? TestIds.REWARDED : 'ca-app-pub-5097211111237502/3093415584',
+        __DEV__ ? TestIds.REWARDED : 'ca-app-pub-5097211111237502/3974638408',
       ),
     [],
   );
@@ -32,7 +32,7 @@ export const AdProvider: React.FC<AdProviderProps> = ({children}) => {
       InterstitialAd.createForAdRequest(
         __DEV__
           ? TestIds.INTERSTITIAL
-          : 'ca-app-pub-5097211111237502/3093415584',
+          : 'ca-app-pub-5097211111237502/2390093991',
       ),
     [],
   );
@@ -172,11 +172,9 @@ export const AdProvider: React.FC<AdProviderProps> = ({children}) => {
     });
   }, [isInterstitialAdLoaded, interstitialAd, loadInterstitialAd]);
 
-  // Show interstitial ad every 3rd level completion
-  const showInterstitialAdEveryThirdLevel = useCallback(
+  const showInterstitialAdEveryFourthLevel = useCallback(
     (levelCompletionCount: number): Promise<void> => {
-      // Check if this is every 3rd completion
-      if ((levelCompletionCount + 1) % 3 === 0) {
+      if ((levelCompletionCount + 1) % 4 === 0) {
         return showInterstitialAd();
       }
       return Promise.resolve();
@@ -258,7 +256,7 @@ export const AdProvider: React.FC<AdProviderProps> = ({children}) => {
     () => ({
       showRewardAd,
       showInterstitialAd,
-      showInterstitialAdEveryThirdLevel,
+      showInterstitialAdEveryFourthLevel,
       reloadRewardAd,
       reloadInterstitialAd,
       isRewardAdLoaded,
@@ -267,7 +265,7 @@ export const AdProvider: React.FC<AdProviderProps> = ({children}) => {
     [
       showRewardAd,
       showInterstitialAd,
-      showInterstitialAdEveryThirdLevel,
+      showInterstitialAdEveryFourthLevel,
       reloadRewardAd,
       reloadInterstitialAd,
       isRewardAdLoaded,

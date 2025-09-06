@@ -26,7 +26,7 @@ import {getCollectorRewardPerHour} from '../utils/helpers';
 
 const adUnitId = __DEV__
   ? TestIds.ADAPTIVE_BANNER
-  : 'ca-app-pub-5097211111237502/3093415584';
+  : 'ca-app-pub-5097211111237502/6618577682';
 
 export const AdBanner = () => {
   const {play} = useSound();
