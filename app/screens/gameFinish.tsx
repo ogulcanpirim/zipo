@@ -50,7 +50,7 @@ export const GameFinishScreen = () => {
     reloadRewardAd,
   } = useAd();
 
-  const {currentLevel, gameFinished, ads_enabled, levelCompletionCount} =
+  const {currentLevel, gameFinished, ads_enabled, levelCompletionCount, isPro} =
     useAppSelector(state => state.userData);
   const maxLevelReached = currentLevel >= MAX_LEVEL;
   const levelAlreadyCompleted = route.params?.level_id
@@ -63,7 +63,7 @@ export const GameFinishScreen = () => {
     if (currentLevel === MAX_LEVEL && !gameFinished) {
       expand({content: <GameFinishModal />});
     }
-    if (ads_enabled && !levelAlreadyCompleted) {
+    if (ads_enabled && !levelAlreadyCompleted && !isPro) {
       showInterstitialAdEveryFourthLevel(levelCompletionCount);
     }
 
